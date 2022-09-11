@@ -25,7 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.version }}
           draft: true
           prerelease: false
           generate_release_notes: true
@@ -70,9 +69,6 @@ jobs:
         uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
         with:
           channel: master
-      - name: Print github.event.inputs.version
-        run: |
-          echo github.event.inputs.version: ${{ github.event.inputs.version }}
       - name: Install Linux dependencies
         if: matrix.target == 'Linux'
         run: |
