@@ -106,21 +106,31 @@ jobs:
         run: mkdir dist 
       - name: Rename build for Android
         if: matrix.target == 'Android'
-        run: ls -alrt
-        run: mv *.apk $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.apk
+        run: |
+          ls -alrt
+          mv *.apk $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.apk
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for Linux
         if: matrix.target == 'Linux'
-        run: ls -alrt
-        run: tar czf $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
+        run: |
+          ls -alrt
+          tar czf $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for macOS
         if: matrix.target == 'macOS'
-        run: ls -alrt
-        run: ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.zip
+        run: |
+          ls -alrt
+          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.zip
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for Windows
         if: matrix.target == 'Windows'
-        run: dir
-        run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\dist\${{ github.event.repository.name }}_${{ matrix.target }}.zip
+        run: |
+          dir
+          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\dist\${{ github.event.repository.name }}_${{ matrix.target }}.zip
         working-directory: ${{ matrix.build_path }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: |
+            dist/
