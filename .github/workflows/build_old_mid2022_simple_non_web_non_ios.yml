@@ -62,7 +62,7 @@ jobs:
         if: matrix.target == 'Android'
         uses: actions/setup-java@v3
         with:
-          java-version: "12.x"
+          java-version: "11.0.16+101"
           distribution: temurin
       - name: Enable desktop support
         if: matrix.target != 'Android'
