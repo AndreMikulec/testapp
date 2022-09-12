@@ -1,4 +1,4 @@
-name: Build Everything Possible
+name: Build Everything
 permissions: read-all
 
 on:
@@ -15,7 +15,7 @@ on:
 
 jobs:
   build_windows_linux:
-    name: Create ${{ matrix.target }} ${{ matrix.build_mode }} build
+    name: Build ${{ matrix.target }} ${{ matrix.build_mode }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -33,7 +33,7 @@ jobs:
             target: Windows
             build_mode: debug
             build_target: windows
-            build_path: build\windows\runner\Release
+            build_path: build\windows\runner\Debug
             asset_extension: .zip
             asset_content_type: application/zip
 
@@ -49,7 +49,7 @@ jobs:
             target: Linux
             build_mode: debug
             build_target: linux
-            build_path: build/linux/x64/release/bundle
+            build_path: build/linux/x64/debug/bundle
             asset_extension: .tar.gz
             asset_content_type: application/gzip
 
