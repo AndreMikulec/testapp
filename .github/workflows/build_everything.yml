@@ -117,7 +117,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: windows_linux_${{ github.event.repository.name }}_dist
+          name: ${{ github.event.repository.name }}_windows_linux_dist
           path: |
             ${{ github.event.repository.name }}_dist/
 
@@ -170,17 +170,17 @@ jobs:
         
           # 
           # Building iOS app generates Flutter.build folder with dgph files under ios/build/
+          #  build/Pods.build/Release-iphonesimulator/Flutter.build
           # https://github.com/flutter/flutter/issues/89912
-          #
-          # build/Pods.build/Release-iphonesimulator/Flutter.build
           #
           # https://en.wikipedia.org/wiki/.ipa
           #
+          # flutter build ios --release --no-codesign --split-debug-info=/
           # https://stackoverflow.com/questions/3728601/what-is-the-correct-mime-type-for-serving-an-iphone-ipa-file
           - os: macos-latest
             target: iOS
-            build_mode: ios
-            build_target: no-codesign
+            build_mode: no-codesign
+            build_target: ios
             build_path: build/Pods.build/Release-iphonesimulator/Flutter.build
             # later figure out the correct . . .
             asset_extension: .zip
@@ -258,5 +258,12 @@ jobs:
         if: matrix.target == 'iOS'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc --keepParent *.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          ditto -c -k --sequesterRsrc --keepParent *.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
         working-directory: ${{ matrix.build_path }}
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}_everything_else_dist
+          path: |
+            ${{ github.event.repository.name }}_dist/
