@@ -14,123 +14,31 @@ on:
       - master
 
 jobs:
-  create-build:
-    name: Create ${{ matrix.target }} build
-    runs-on: ${{ matrix.os }}
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: macos-latest
     strategy:
-      matrix:
-        target: [macOS, Windows, Linux, Android]
-        include:
-          - os: macos-latest
-            target: macOS
-            build_target: macos
-            build_path: build/macos/Build/Products/Release
-            asset_extension: .zip
-            asset_content_type: application/zip
-          - os: windows-latest
-            target: Windows
-            build_target: windows
-            build_path: build\windows\runner\Release
-            asset_extension: .zip
-            asset_content_type: application/zip
-          - os: ubuntu-latest
-            target: Linux
-            build_target: linux
-            build_path: build/linux/x64/release/bundle
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
-          - os: macos-latest
-            target: Android
-            build_target: apk
-            build_path: build/app/outputs/flutter-apk
-            asset_extension: .apk
-            asset_content_type: application/vnd.android.package-archive
-      # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
+      matrix:
+        target: ["apk --debug", "appbundle --debug", "ios --no-codesign", macos, web]
     steps:
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: temurin
       # Set up Flutter.
       - name: Clone Flutter repository with master channel
         uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
         with:
           channel: master
-      - name: Install Linux dependencies
-        if: matrix.target == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev
-      - name: Install Android dependencies
-        if: matrix.target == 'Android'
-        uses: actions/setup-java@v3
-        with:
-          java-version: "18.0.2+101"
-          distribution: temurin
-      - name: Enable desktop support
-        if: matrix.target != 'Android'
-        run: |
-          flutter config --enable-linux-desktop
-          flutter config --enable-macos-desktop
-          flutter config --enable-windows-desktop
+      - run: flutter config --enable-macos-desktop
       - run: flutter doctor -v
-      # Checkout gallery code, recreate missing files, and get packages.
+
+      # Checkout gallery code and get packages.
       - name: Checkout gallery code
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      - run: flutter create .
-      - run: flutter pub get
-#     - name: Configure Keystore for Android
-#       if: matrix.target == 'Android'
-#       run: |
-#         echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
-#         echo "storeFile=upload-keystore.jks" >> key.properties
-#         echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> key.properties
-#         echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> key.properties
-#         echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> key.properties
-#       env:
-#         PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
-#         KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-#         KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-#         KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-#       working-directory: android
+      - run: flutter pub get -v
 
-      # Build the application.
-      - run: flutter build ${{ matrix.build_target }} --release
+      - run: flutter build ${{ matrix.target }}
 
-      # Package the build.
-      - name: Copy VC redistributables to release directory for Windows
-        if: matrix.target == 'Windows'
-        run: |
-          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\msvcp140.dll') .
-          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140.dll') .
-          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
-        working-directory: ${{ matrix.build_path }}
-      - name: Make a dist directory
-        run: mkdir ${{ github.event.repository.name }}_dist 
-      - name: Rename build for Android
-        if: matrix.target == 'Android'
-        run: |
-          ls -alrt
-          mv *.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.apk
-        working-directory: ${{ matrix.build_path }}
-      - name: Compress build for Linux
-        if: matrix.target == 'Linux'
-        run: |
-          ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
-        working-directory: ${{ matrix.build_path }}
-      - name: Compress build for macOS
-        if: matrix.target == 'macOS'
-        run: |
-          ls -alrt
-          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.zip
-        working-directory: ${{ matrix.build_path }}
-      - name: Compress build for Windows
-        if: matrix.target == 'Windows'
-        run: |
-          dir
-          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}.zip
-        working-directory: ${{ matrix.build_path }}
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}_dist
-          path: |
-            ${{ github.event.repository.name }}_dist/
