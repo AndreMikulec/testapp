@@ -39,7 +39,7 @@ jobs:
             build_path: build/linux/x64/release/bundle
             asset_extension: .tar.gz
             asset_content_type: application/gzip
-          - os: ubuntu-latest
+          - os: macos-latest
             target: Android
             build_target: apk
             build_path: build/app/outputs/flutter-apk
@@ -103,34 +103,34 @@ jobs:
           Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
         working-directory: ${{ matrix.build_path }}
       - name: Make a dist directory
-        run: mkdir dist 
+        run: mkdir ${{ github.event.repository.name }}_dist 
       - name: Rename build for Android
         if: matrix.target == 'Android'
         run: |
           ls -alrt
-          mv *.apk $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.apk
+          mv *.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.apk
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for Linux
         if: matrix.target == 'Linux'
         run: |
           ls -alrt
-          tar czf $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
+          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for macOS
         if: matrix.target == 'macOS'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/dist/${{ github.event.repository.name }}_${{ matrix.target }}.zip
+          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.zip
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for Windows
         if: matrix.target == 'Windows'
         run: |
           dir
-          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\dist\${{ github.event.repository.name }}_${{ matrix.target }}.zip
+          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}.zip
         working-directory: ${{ matrix.build_path }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist
+          name: ${{ github.event.repository.name }}_dist
           path: |
-            dist/
+            ${{ github.event.repository.name }}_dist/
