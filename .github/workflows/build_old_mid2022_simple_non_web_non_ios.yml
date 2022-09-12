@@ -104,17 +104,21 @@ jobs:
         working-directory: ${{ matrix.build_path }}
       - name: Rename build for Android
         if: matrix.target == 'Android'
+        run: ls -alrt
         run: mv *.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}.apk
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for Linux
         if: matrix.target == 'Linux'
+        run: ls -alrt
         run: tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for macOS
         if: matrix.target == 'macOS'
+        run: ls -alrt
         run: ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}.zip
         working-directory: ${{ matrix.build_path }}
       - name: Compress build for Windows
         if: matrix.target == 'Windows'
+        run: dir
         run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}.zip
         working-directory: ${{ matrix.build_path }}
