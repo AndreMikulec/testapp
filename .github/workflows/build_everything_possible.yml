@@ -1,4 +1,4 @@
-name: Build All
+name: Build Everything Possible
 permissions: read-all
 
 on:
@@ -15,23 +15,40 @@ on:
 
 jobs:
   build_windows_linux:
-    name: Create ${{ matrix.target }} build
+    name: Create ${{ matrix.target }} ${{ matrix.build_mode }} build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-
         include:
 
           - os: windows-latest
             target: Windows
-            build_target: windows --release
+            build_mode: release
+            build_target: windows
+            build_path: build\windows\runner\Release
+            asset_extension: .zip
+            asset_content_type: application/zip
+
+          - os: windows-latest
+            target: Windows
+            build_mode: debug
+            build_target: windows
             build_path: build\windows\runner\Release
             asset_extension: .zip
             asset_content_type: application/zip
 
           - os: ubuntu-latest
             target: Linux
-            build_target: linux --release
+            build_mode: release
+            build_target: linux
+            build_path: build/linux/x64/release/bundle
+            asset_extension: .tar.gz
+            asset_content_type: application/gzip
+
+          - os: ubuntu-latest
+            target: Linux
+            build_mode: debug
+            build_target: linux
             build_path: build/linux/x64/release/bundle
             asset_extension: .tar.gz
             asset_content_type: application/gzip
@@ -68,7 +85,7 @@ jobs:
       - run: flutter pub get
 
       # Build the application.
-      - run: flutter build ${{ matrix.build_target }}
+      - run: flutter build ${{ matrix.build_target }} --${{ matrix.build_mode }}
 
       # Package the build.
       - name: Copy VC redistributables to release directory for Windows
@@ -86,19 +103,19 @@ jobs:
         if: matrix.target == 'Linux'
         run: |
           ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}.tar.gz *
+          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for Windows
         if: matrix.target == 'Windows'
         run: |
           dir
-          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}.zip
+          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}_dist
+          name: windows_linux_${{ github.event.repository.name }}_dist
           path: |
             ${{ github.event.repository.name }}_dist/
