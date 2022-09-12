@@ -19,9 +19,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target: [Windows, Linux]
+
         include:
-        
+
           - os: windows-latest
             target: Windows
             build_target: windows --release
