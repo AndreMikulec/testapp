@@ -206,7 +206,7 @@ jobs:
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - run: flutter pub get
 
-      - run: flutter build ${{ matrix.target }} --${{ matrix.build_mode }}
+      - run: flutter build ${{ matrix.build_target }} --${{ matrix.build_mode }}
 
       - name: Make a dist directory
         run: mkdir ${{ github.event.repository.name }}_dist 
