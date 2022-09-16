@@ -407,7 +407,7 @@ jobs:
             target: iOS
             build_mode: no-codesign
             build_target: ipa
-            build_path: build/ios/ipa
+            build_path: build
             # later figure out the correct . . .
             # asset_extension: .zip
             # asset_content_type: application/zip
