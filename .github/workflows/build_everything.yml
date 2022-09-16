@@ -14,112 +14,113 @@ on:
       - master
 
 jobs:
-  build_windows_linux:
-    name: Build ${{ matrix.target }} ${{ matrix.build_mode }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      # Disable fail-fast as we want results from all even if one fails.
-      fail-fast: false
-      matrix:
-        include:
 
-          - os: windows-latest
-            target: Windows
-            build_mode: release
-            build_target: windows
-            build_path: build\windows\runner\Release
-            asset_extension: .zip
-            asset_content_type: application/zip
-
-          - os: windows-latest
-            target: Windows
-            build_mode: debug
-            build_target: windows
-            build_path: build\windows\runner\Debug
-            asset_extension: .zip
-            asset_content_type: application/zip
-
-          - os: ubuntu-latest
-            target: Linux
-            build_mode: release
-            build_target: linux
-            build_path: build/linux/x64/release/bundle
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
-
-          - os: ubuntu-latest
-            target: Linux
-            build_mode: debug
-            build_target: linux
-            build_path: build/linux/x64/debug/bundle
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
-
-
-    steps:
-      # Set up Flutter.
-      - name: Clone Flutter repository with master channel
-        uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
-        with:
-          channel: master
-          
-      - name: Install Linux dependencies
-        if: matrix.target == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev
-          
-      - name: Enable Windows desktop support
-        if: matrix.target == 'Windows'
-        run: flutter config --enable-windows-desktop
-        
-      - name: Enable Linux desktop support
-        if: matrix.target == 'Linux'
-        run: flutter config --enable-linux-desktop
-          
-      - run: flutter doctor -v
-      
-      # Checkout gallery code, recreate missing files, and get packages.
-      - name: Checkout gallery code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      - run: flutter create .
-      - run: flutter pub get
-
-      # Build the application.
-      - run: flutter build ${{ matrix.build_target }} --${{ matrix.build_mode }}
-
-      # Package the build.
-      - name: Copy VC redistributables to release directory for Windows
-        if: matrix.target == 'Windows'
-        run: |
-          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\msvcp140.dll') .
-          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140.dll') .
-          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
-        working-directory: ${{ matrix.build_path }}
-        
-      - name: Make a dist directory
-        run: mkdir ${{ github.event.repository.name }}_dist 
-
-      - name: Compress build for Linux
-        if: matrix.target == 'Linux'
-        run: |
-          ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
-        working-directory: ${{ matrix.build_path }}
-
-      - name: Compress build for Windows
-        if: matrix.target == 'Windows'
-        run: |
-          dir
-          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
-        working-directory: ${{ matrix.build_path }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}_windows_linux_dist
-          path: |
-            ${{ github.event.repository.name }}_dist/
+#   build_windows_linux:
+#     name: Build ${{ matrix.target }} ${{ matrix.build_mode }}
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       # Disable fail-fast as we want results from all even if one fails.
+#       fail-fast: false
+#       matrix:
+#         include:
+# 
+#           - os: windows-latest
+#             target: Windows
+#             build_mode: release
+#             build_target: windows
+#             build_path: build\windows\runner\Release
+#             asset_extension: .zip
+#             asset_content_type: application/zip
+# 
+#           - os: windows-latest
+#             target: Windows
+#             build_mode: debug
+#             build_target: windows
+#             build_path: build\windows\runner\Debug
+#             asset_extension: .zip
+#             asset_content_type: application/zip
+# 
+#           - os: ubuntu-latest
+#             target: Linux
+#             build_mode: release
+#             build_target: linux
+#             build_path: build/linux/x64/release/bundle
+#             asset_extension: .tar.gz
+#             asset_content_type: application/gzip
+# 
+#           - os: ubuntu-latest
+#             target: Linux
+#             build_mode: debug
+#             build_target: linux
+#             build_path: build/linux/x64/debug/bundle
+#             asset_extension: .tar.gz
+#             asset_content_type: application/gzip
+# 
+# 
+#     steps:
+#       # Set up Flutter.
+#       - name: Clone Flutter repository with master channel
+#         uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
+#         with:
+#           channel: master
+#           
+#       - name: Install Linux dependencies
+#         if: matrix.target == 'Linux'
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev
+#           
+#       - name: Enable Windows desktop support
+#         if: matrix.target == 'Windows'
+#         run: flutter config --enable-windows-desktop
+#         
+#       - name: Enable Linux desktop support
+#         if: matrix.target == 'Linux'
+#         run: flutter config --enable-linux-desktop
+#           
+#       - run: flutter doctor -v
+#       
+#       # Checkout gallery code, recreate missing files, and get packages.
+#       - name: Checkout gallery code
+#         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+#       - run: flutter create .
+#       - run: flutter pub get
+# 
+#       # Build the application.
+#       - run: flutter build ${{ matrix.build_target }} --${{ matrix.build_mode }}
+# 
+#       # Package the build.
+#       - name: Copy VC redistributables to release directory for Windows
+#         if: matrix.target == 'Windows'
+#         run: |
+#           Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\msvcp140.dll') .
+#           Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140.dll') .
+#           Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
+#         working-directory: ${{ matrix.build_path }}
+#         
+#       - name: Make a dist directory
+#         run: mkdir ${{ github.event.repository.name }}_dist 
+# 
+#       - name: Compress build for Linux
+#         if: matrix.target == 'Linux'
+#         run: |
+#           ls -alrt
+#           tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
+#         working-directory: ${{ matrix.build_path }}
+# 
+#       - name: Compress build for Windows
+#         if: matrix.target == 'Windows'
+#         run: |
+#           dir
+#           compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+#         working-directory: ${{ matrix.build_path }}
+# 
+#       - name: Upload artifacts
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ github.event.repository.name }}_windows_linux_dist
+#           path: |
+#             ${{ github.event.repository.name }}_dist/
 
   build_apk_appbundle_ios_macos_web:
     name: Build ${{ matrix.target }} ${{ matrix.build_mode }}
@@ -130,65 +131,136 @@ jobs:
       matrix:
         include:
         
-          - os: macos-latest
-            target: Android
-            build_mode: debug
-            build_target: apk
-            build_path: build/app/outputs/flutter-apk
-            asset_extension: .zip
-            asset_content_type: application/zip
-            # .apk application/vnd.android.package-archive
+#           - os: macos-latest
+#             target: Android
+#             build_mode: debug
+#             build_target: apk
+#             build_path: build/app/outputs/flutter-apk
+#             asset_extension: .zip
+#             asset_content_type: application/zip
+#             # .apk application/vnd.android.package-archive
             
-          - os: macos-latest
-            target: macOS
-            build_mode: debug
-            build_target: macos
-            build_path: build/macos/Build/Products/Debug
-            asset_extension: .zip
-            asset_content_type: application/zip
+#           - os: macos-latest
+#             target: macOS
+#             build_mode: debug
+#             build_target: macos
+#             build_path: build/macos/Build/Products/Debug
+#             asset_extension: .zip
+#             asset_content_type: application/zip
         
          #  "appbundle --debug", "ios --no-codesign", web
          
          # Note, no such option combination exists "web --debug" 
          # Note, exists: "web --release"
-          - os: macos-latest
-            target: Web
-            build_mode: release
-            build_target: web
-            build_path: build/web
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
+#           - os: macos-latest
+#             target: Web
+#             build_mode: release
+#             build_target: web
+#             build_path: build/web
+#             asset_extension: .tar.gz
+#             asset_content_type: application/gzip
         
-          - os: macos-latest
-            target: AppBundle
-            build_mode: debug
-            build_target: appbundle
-            build_path: build/app/outputs/bundle/debug
-            asset_extension: .zip
-            asset_content_type: application/zip
-            # .aab application/x-authorware-bin
-        
+#           - os: macos-latest
+#             target: AppBundle
+#             build_mode: debug
+#             build_target: appbundle
+#             build_path: build/app/outputs/bundle/debug
+#             asset_extension: .zip
+#             asset_content_type: application/zip
+#             # .aab application/x-authorware-bin
+#         
           # 
           # Building iOS app generates Flutter.build folder with dgph files under ios/build/
-          #  build/Pods.build/Release-iphonesimulator/Flutter.build
+          #   build/Pods.build/Release-iphonesimulator/Flutter.build
           # https://github.com/flutter/flutter/issues/89912
           #
           # https://en.wikipedia.org/wiki/.ipa
           #
           # flutter build ios --release --no-codesign --split-debug-info=/
           # https://stackoverflow.com/questions/3728601/what-is-the-correct-mime-type-for-serving-an-iphone-ipa-file
+          
+          # help
+          # @RandalScwartz
+          # https://discord.com/channels/420324994703163402/465280829266984980
+          #
+          # What does the command flutter build ios do if we can get the release-ipa with Xcode archive? #64626
+          #   flutter build ios --bundle-sksl-path flutter_01.sksl.json
+          #   runner.app in folder my_project\build\ios\iphoneos\ and compress it to IPA myself?
+          # AUGUST 2020 (TODAY IS SEPTEMBER 2022)
+          # https://github.com/flutter/flutter/issues/64626
+          # AND
+          #  
+          # How to create .ipa file for testing using Runner.app?
+          # 
+          # create Runner.app file using command from Terminal:
+          # flutter build ios --debug
+          #   The location of Runner.app file is
+          #     my_project_folder/build/ios/iphoneos/Runner.app
+          # 
+          # flutter build ios --release/debug
+          # build/ios/iphoneos/Runner.app
+          # 
+          # MAR 2021 (TODAY IS SEPTEMBER 2022)
+          # https://stackoverflow.com/questions/51254470/how-to-create-ipa-file-for-testing-using-runner-app
+          #
+          #   You can create .ipa file by your self and send iOS build url to your client or other.
+          # 
+          #   1) Generate your iOS build by below command
+          #   -> flutter build ios --release/debug
+          #   2) You will found exact path of your Runner.app Ex.
+          #   -> Built /Users/UserName/Documents/AppName/build/ios/iphoneos/Runner.app. 
+          #   Just find this Runner.app file and do copy/paste it to Desktop.
+          #   3) Create folder name is "Payload" (case-sensitive) on Desktop
+          #   4) Move your Runner.app File in the "Payload" folder.
+          #   5) Compress Payload folder to default .zip
+          #   6) Convert/rename Payload.zip to Payload.ipa
+          # 
+          #   scripted - generate-ios.sh
+          #   
+          #     mkdir -p Payload
+          #     mv ./build/ios/iphoneos/Runner.app Payload
+          #     zip -r -y Payload.zip Payload/Runner.app
+          #     mv Payload.zip Payload.ipa
+          #       
+          #   https://gist.github.com/monmonja/6e2910ca51d64b8be8bb8d28d0d34a55
+          #   
+          #   SOLUTION
+          #   flutter build ipa 
+          #   is now available and takes an optional 
+          #     --export-options-plist 
+          #   flag to make an IPA from the archive bundle. 
+          #   See flutter build ipa -h on the master channel for details.
+          #   
+          # Flutter: Build an IPA
+          # 
+          # flutter build ipa --export-options-plist=ios/exportOptions.plist
+          # Built IPA to /Users/{USER}/{YOUR PROJECT PATHWAY}/build/ios/ipa
+          # 
+          # Flutter: Build an IPA
+          # Joseph Muller
+          # Jul 29, 2021
+          # https://jtmuller5-98869.medium.com/flutter-build-an-ipa-90520e813a96
+          #   
+          # ANDRE: Runner.app is a DIRECTORY and both are the same size
+          #
+          # build ios --release --no-codesign --split-debug-info=/
+          #
+          # build\ios\Release-iphoneos\Runner.app
+          # build\ios\Runner.app
+                    
+          
           - os: macos-latest
             target: iOS
             build_mode: no-codesign
             build_target: ios
-          # build_path: build/Pods.build/Release-iphonesimulator/Flutter.build
-            build_path: build
+            build_path: build\ios\iphoneos
             # later figure out the correct . . .
             # asset_extension: .zip
             # asset_content_type: application/zip
-            # # .ipa application/octet-stream ? ?
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
+            # asset_extension: .ipa 
+            # asset_content_type: application/octet-stream ??
+            # asset_extension: .tar.gz
+            # asset_content_type: application/gzip
 
     steps:
       - name: Set up JDK 11
@@ -262,7 +334,7 @@ jobs:
         run: |
           ls -alrt
           find .
-          # ditto -c -k --sequesterRsrc --keepParent *.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          # ditto -c -k --sequesterRsrc  --keepParent *.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
           tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
         
