@@ -334,8 +334,8 @@ jobs:
         run: |
           ls -alrt
           find .
-          # ditto -c -k --sequesterRsrc  --keepParent *.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
+          ditto -c -k --sequesterRsrc  --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.ipa
+          # tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
         
       - name: Upload artifacts
