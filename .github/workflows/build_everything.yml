@@ -387,7 +387,7 @@ jobs:
 
           - os: macos-latest
             target: iOS
-            build_mode: release
+            build_mode: debug
             build_target: ipa
             build_path: build/ios/ipa
             # later figure out the correct . . .
