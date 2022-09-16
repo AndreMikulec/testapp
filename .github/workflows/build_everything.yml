@@ -385,9 +385,27 @@ jobs:
           # Progressive Web App(PWA) in Flutter
           # https://medium.flutterdevs.com/progressive-web-app-flutter-62c7dea05fc5
 
+          # No valid code signing certificates were found
+          # ---------------------------------------------
+          # 
+          # flutter build ipa --debug
+          # flutter build ipa --release
+          # 
+          # You should do exactly as the error states.
+          # 
+          # No valid code signing certificates were found
+          # 
+          # Open /{ProjectName}/ios/Runner.xcworkspace
+          # Click the top level runner file on the left
+          # Go to signing & capabilities
+          # Change your team and bundle identifier accordingly.
+          # 
+          # https://stackoverflow.com/questions/63992938/unable-to-perform-flutter-build-ios
+
+
           - os: macos-latest
             target: iOS
-            build_mode: debug
+            build_mode: no-codesign
             build_target: ipa
             build_path: build/ios/ipa
             # later figure out the correct . . .
@@ -468,6 +486,7 @@ jobs:
       - name: Compress build for iOS
         if: matrix.target == 'iOS'
         run: |
+          flutter build ipa -h
           # ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
           tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
