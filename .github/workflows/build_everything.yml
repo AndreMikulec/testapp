@@ -248,12 +248,148 @@ jobs:
           # build\ios\Release-iphoneos\Runner.app
           # build\ios\Runner.app
                     
-          
+          # Build and release an iOS app
+          # ----------------------------
+          # 
+          #   flutter build ipa
+          #     Both the version and the build number can be overridden in 
+          #     flutter build ipa by specifying 
+          #       --build-name 
+          #       and 
+          #       --build-number, respectively.
+          # 
+          # Run 
+          #   flutter build ipa 
+          #   to produce an 
+          #   Xcode build archive (.xcarchive file) in your project’s 
+          #                                       build/ios/archive/ directory 
+          #   and an 
+          #   App Store app bundle (.ipa file) in build/ios/ipa.
+          #   
+          # Consider adding the --obfuscate and --split-debug-info flags to obfuscate your Dart code 
+          # to make it more difficult to reverse engineer.
+          # 
+          # If you are not distributing to the App Store, 
+          #   you can optionally choose a different export method by adding the option 
+          #     --export-method ad-hoc, --export-method development or --export-method enterprise.
+          # 
+          # ETC
+          #   Create a build archive and upload to App Store Connect
+          # 
+          # Build and release an iOS app
+          # SEEN SEP 2022
+          # https://docs.flutter.dev/deployment/ios
+          # 
+          # 
+          # Obfuscating your app
+          # -------------------
+          # 
+          # Android/iOS/macOS
+          #   Supported.
+          # Linux/Windows
+          #   Not yet supported.
+          #   
+          # web
+          #   Obfuscation is not supported for web apps, 
+          #   but a web app can be minified, which is similar. 
+          #   When you build a release version of a Flutter web app, 
+          #   it is automatically minified. 
+          # 
+          # --obfuscate flag, combined with the --split-debug-info flag. 
+          # The --split-debug-info flag specifies the directory where Flutter can output debug files.
+          # 
+          # SEP 2022
+          # https://docs.flutter.dev/deployment/obfuscate
+          # 
+          # 
+          # 
+          # Build iOS IPAs with --no-codesign (NOTHING TO DO)
+          # --------------------------------------------------
+          # 
+          # flutter build ios --release --obfuscate --split-debug-info build/ios/outputs/symbols --no-codesign
+          #   --suppress-analytics
+          # 
+          #   ipa is already unassigned, it is just archive, which is signed later
+          # 
+          # flutter build ipa --release --obfuscate --split-debug-info build/ios/outputs/symbols
+          # 
+          # Build iOS IPAs with --no-codesign for local debugging #89567
+          # SEP 2021
+          # https://github.com/flutter/flutter/issues/89567
+          # 
+          # --no-codesign is not removed, 
+          # 
+          #   it still exists in 
+          #   
+          #   flutter build ios 
+          #   
+          # so the website doc is accurate, 
+          # there is no such option for ipa, it was never was.
+          # 
+          # Where is --no-codesign and --codesign command line for the IPA build ? #88569
+          # AUG 2021
+          # https://github.com/flutter/flutter/issues/88569
+          # 
+          # 
+          # 
+          # (SHOULDTRY)
+          # Progressive Web App(PWA) in Flutter using firebase
+          # --------------------------------------------------
+          # 
+          # the user wants to use your without installing it
+          # 
+          # flutter config --enable-web
+          # 
+          #   flutter build web -h
+          #     --release  Build a release version of your app (default mode).
+          #     --pwa-strategy
+          #       [none]  Generate a service worker with no body. This is useful for local testing
+          #       [offline-first] (default)    
+          #         Attempt to cache the application shell eagerly 
+          #           and then lazily cache all subsequent assets as they are loaded.
+          # 
+          #   SEP 2021
+          #   flutter build web -h
+          # 
+          # firebase
+          # - - - -- 
+          # 
+          # npm install -g firebase-tools
+          # 
+          # firebase login
+          # 
+          # npm install -g firebase-tools@7.6.1 
+          # or
+          # npm i firebase-tools@7.6.1
+          # 
+          # firebase login
+          #    it will take you to the screen where you 
+          #      need to verify your firebase account
+          # firebase init
+          #   ANSWER QUESTIONS
+          #     public directory? build/web
+          #     Configure as a single page app? No
+          #     Overwrite 404.html? No
+          #     index already exists. Overwrite? No
+          # 
+          # firebase deploy
+          # firebase open
+          # 
+          # . . . end . . .
+          # 
+          # Hosting URL: 
+          #   https://graphql-pwa-web.app
+          # 
+          # Shivanchal Pandey
+          # Jun 19, 2020
+          # Progressive Web App(PWA) in Flutter
+          # https://medium.flutterdevs.com/progressive-web-app-flutter-62c7dea05fc5
+
           - os: macos-latest
             target: iOS
-            build_mode: no-codesign
-            build_target: ios
-            build_path: build/ios/iphoneos
+            build_mode: release
+            build_target: ipa
+            build_path: build/ios/ipa
             # later figure out the correct . . .
             # asset_extension: .zip
             # asset_content_type: application/zip
@@ -332,8 +468,8 @@ jobs:
       - name: Compress build for iOS
         if: matrix.target == 'iOS'
         run: |
-          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
-          # tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
+          # ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
         
       - name: Upload artifacts
