@@ -16,7 +16,7 @@ on:
 jobs:
 
   build_windows_linux:
-    name: Build ${{ matrix.target }} ${{ matrix.build_mode }}
+    name: Build ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: ${{ matrix.os }}
     strategy:
       # Disable fail-fast as we want results from all even if one fails.
@@ -24,37 +24,41 @@ jobs:
       matrix:
         include:
 
-          - os: windows-latest
-            target: Windows
-            build_mode: release
-            build_target: windows
-            build_path: build\windows\runner\Release
-            asset_extension: .zip
-            asset_content_type: application/zip
-
-          - os: windows-latest
-            target: Windows
-            build_mode: debug
-            build_target: windows
-            build_path: build\windows\runner\Debug
-            asset_extension: .zip
-            asset_content_type: application/zip
-
           - os: ubuntu-latest
             target: Linux
-            build_mode: release
+            target_detail: Release
             build_target: linux
+            build_mode: release
             build_path: build/linux/x64/release/bundle
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
+            # asset_extension: .tar.gz
+            # asset_content_type: application/gzip
 
           - os: ubuntu-latest
             target: Linux
-            build_mode: debug
+            target_detail: Debug
             build_target: linux
+            build_mode: debug
             build_path: build/linux/x64/debug/bundle
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
+            # asset_extension: .tar.gz
+            # asset_content_type: application/gzip
+
+          - os: windows-latest
+            target: Windows
+            target_detail: Release
+            build_target: windows
+            build_mode: release
+            build_path: build\windows\runner\Release
+            # asset_extension: .zip
+            # asset_content_type: application/zip
+
+          - os: windows-latest
+            target: Windows
+            target_detail: Debug
+            build_target: windows
+            build_mode: debug
+            build_path: build\windows\runner\Debug
+            # asset_extension: .zip
+            # asset_content_type: application/zip
 
     steps:
       # Set up Flutter.
@@ -98,31 +102,31 @@ jobs:
         working-directory: ${{ matrix.build_path }}
         
       - name: Make a dist directory
-        run: mkdir ${{ github.event.repository.name }}_dist 
+        run: mkdir ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist 
 
       - name: Compress build for Linux
         if: matrix.target == 'Linux'
         run: |
           ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
+          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for Windows
         if: matrix.target == 'Windows'
         run: |
           dir
-          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}_windows_linux_dist
+          name: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
           path: |
-            ${{ github.event.repository.name }}_dist/
+            ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/
 
   build_apk_appbundle_ios_macos_web:
-    name: Build ${{ matrix.target }} ${{ matrix.build_mode }}
+    name: Build ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: macos-latest
     strategy:
       # Disable fail-fast as we want results from all even if one fails.
@@ -132,294 +136,59 @@ jobs:
         
           - os: macos-latest
             target: Android
-            build_mode: debug
+            target_detail: Debug
             build_target: apk
+            build_mode: debug
             build_path: build/app/outputs/flutter-apk
-            asset_extension: .zip
-            asset_content_type: application/zip
-            # .apk application/vnd.android.package-archive
+            # asset_extension: .zip
+            # asset_content_type: application/zip
+            # asset_extension: .apk 
+            # asset_content_type: application/vnd.android.package-archive
             
           - os: macos-latest
             target: macOS
-            build_mode: debug
+            target_detail: Debug
             build_target: macos
+            build_mode: debug
             build_path: build/macos/Build/Products/Debug
-            asset_extension: .zip
-            asset_content_type: application/zip
+            # asset_extension: .zip
+            # asset_content_type: application/zip
         
          #  "appbundle --debug", "ios --no-codesign", web
-         
+         #
          # Note, no such option combination exists "web --debug" 
          # Note, exists: "web --release"
+         #
           - os: macos-latest
             target: Web
-            build_mode: release
+            target_detail: Release
             build_target: web
+            build_mode: release
             build_path: build/web
-            asset_extension: .tar.gz
-            asset_content_type: application/gzip
+            # asset_extension: .tar.gz
+            # asset_content_type: application/gzip
       
           - os: macos-latest
             target: AppBundle
-            build_mode: debug
+            target_detail: Debug
             build_target: appbundle
+            build_mode: debug
             build_path: build/app/outputs/bundle/debug
-            asset_extension: .zip
-            asset_content_type: application/zip
-            # .aab application/x-authorware-bin
-        
-          # 
-          # Building iOS app generates Flutter.build folder with dgph files under ios/build/
-          #   build/Pods.build/Release-iphonesimulator/Flutter.build
-          # https://github.com/flutter/flutter/issues/89912
-          #
-          # https://en.wikipedia.org/wiki/.ipa
-          #
-          # flutter build ios --release --no-codesign --split-debug-info=/
-          # https://stackoverflow.com/questions/3728601/what-is-the-correct-mime-type-for-serving-an-iphone-ipa-file
-          
-          # help
-          # @RandalScwartz
-          # https://discord.com/channels/420324994703163402/465280829266984980
-          #
-          # What does the command flutter build ios do if we can get the release-ipa with Xcode archive? #64626
-          #   flutter build ios --bundle-sksl-path flutter_01.sksl.json
-          #   runner.app in folder my_project\build\ios\iphoneos\ and compress it to IPA myself?
-          # AUGUST 2020 (TODAY IS SEPTEMBER 2022)
-          # https://github.com/flutter/flutter/issues/64626
-          # AND
-          #  
-          # How to create .ipa file for testing using Runner.app?
-          # 
-          # create Runner.app file using command from Terminal:
-          # flutter build ios --debug
-          #   The location of Runner.app file is
-          #     my_project_folder/build/ios/iphoneos/Runner.app
-          # 
-          # flutter build ios --release/debug
-          # build/ios/iphoneos/Runner.app
-          # 
-          # MAR 2021 (TODAY IS SEPTEMBER 2022)
-          # https://stackoverflow.com/questions/51254470/how-to-create-ipa-file-for-testing-using-runner-app
-          #
-          #   You can create .ipa file by your self and send iOS build url to your client or other.
-          # 
-          #   1) Generate your iOS build by below command
-          #   -> flutter build ios --release/debug
-          #   2) You will found exact path of your Runner.app Ex.
-          #   -> Built /Users/UserName/Documents/AppName/build/ios/iphoneos/Runner.app. 
-          #   Just find this Runner.app file and do copy/paste it to Desktop.
-          #   3) Create folder name is "Payload" (case-sensitive) on Desktop
-          #   4) Move your Runner.app File in the "Payload" folder.
-          #   5) Compress Payload folder to default .zip
-          #   6) Convert/rename Payload.zip to Payload.ipa
-          # 
-          #   scripted - generate-ios.sh
-          #   
-          #     mkdir -p Payload
-          #     mv ./build/ios/iphoneos/Runner.app Payload
-          #     zip -r -y Payload.zip Payload/Runner.app
-          #     mv Payload.zip Payload.ipa
-          #       
-          #   https://gist.github.com/monmonja/6e2910ca51d64b8be8bb8d28d0d34a55
-          #   
-          #   SOLUTION
-          #   flutter build ipa 
-          #   is now available and takes an optional 
-          #     --export-options-plist 
-          #   flag to make an IPA from the archive bundle. 
-          #   See flutter build ipa -h on the master channel for details.
-          #   
-          # Flutter: Build an IPA
-          # 
-          # flutter build ipa --export-options-plist=ios/exportOptions.plist
-          # Built IPA to /Users/{USER}/{YOUR PROJECT PATHWAY}/build/ios/ipa
-          # 
-          # Flutter: Build an IPA
-          # Joseph Muller
-          # Jul 29, 2021
-          # https://jtmuller5-98869.medium.com/flutter-build-an-ipa-90520e813a96
-          #   
-          # ANDRE: Runner.app is a DIRECTORY and both are the same size
-          #
-          # build ios --release --no-codesign --split-debug-info=/
-          #
-          # build\ios\Release-iphoneos\Runner.app
-          # build\ios\Runner.app
-                    
-          # Build and release an iOS app
-          # ----------------------------
-          # 
-          #   flutter build ipa
-          #     Both the version and the build number can be overridden in 
-          #     flutter build ipa by specifying 
-          #       --build-name 
-          #       and 
-          #       --build-number, respectively.
-          # 
-          # Run 
-          #   flutter build ipa 
-          #   to produce an 
-          #   Xcode build archive (.xcarchive file) in your project’s 
-          #                                       build/ios/archive/ directory 
-          #   and an 
-          #   App Store app bundle (.ipa file) in build/ios/ipa.
-          #   
-          # Consider adding the --obfuscate and --split-debug-info flags to obfuscate your Dart code 
-          # to make it more difficult to reverse engineer.
-          # 
-          # If you are not distributing to the App Store, 
-          #   you can optionally choose a different export method by adding the option 
-          #     --export-method ad-hoc, --export-method development or --export-method enterprise.
-          # 
-          # ETC
-          #   Create a build archive and upload to App Store Connect
-          # 
-          # Build and release an iOS app
-          # SEEN SEP 2022
-          # https://docs.flutter.dev/deployment/ios
-          # 
-          # 
-          # Obfuscating your app
-          # -------------------
-          # 
-          # Android/iOS/macOS
-          #   Supported.
-          # Linux/Windows
-          #   Not yet supported.
-          #   
-          # web
-          #   Obfuscation is not supported for web apps, 
-          #   but a web app can be minified, which is similar. 
-          #   When you build a release version of a Flutter web app, 
-          #   it is automatically minified. 
-          # 
-          # --obfuscate flag, combined with the --split-debug-info flag. 
-          # The --split-debug-info flag specifies the directory where Flutter can output debug files.
-          # 
-          # SEP 2022
-          # https://docs.flutter.dev/deployment/obfuscate
-          # 
-          # 
-          # 
-          # Build iOS IPAs with --no-codesign (NOTHING TO DO)
-          # --------------------------------------------------
-          # 
-          # flutter build ios --release --obfuscate --split-debug-info build/ios/outputs/symbols --no-codesign
-          #   --suppress-analytics
-          # 
-          #   ipa is already unassigned, it is just archive, which is signed later
-          # 
-          # flutter build ipa --release --obfuscate --split-debug-info build/ios/outputs/symbols
-          # 
-          # Build iOS IPAs with --no-codesign for local debugging #89567
-          # SEP 2021
-          # https://github.com/flutter/flutter/issues/89567
-          # 
-          # --no-codesign is not removed, 
-          # 
-          #   it still exists in 
-          #   
-          #   flutter build ios 
-          #   
-          # so the website doc is accurate, 
-          # there is no such option for ipa, it was never was.
-          # 
-          # Where is --no-codesign and --codesign command line for the IPA build ? #88569
-          # AUG 2021
-          # https://github.com/flutter/flutter/issues/88569
-          # 
-          # 
-          # 
-          # (SHOULDTRY)
-          # Progressive Web App(PWA) in Flutter using firebase
-          # --------------------------------------------------
-          # 
-          # the user wants to use your without installing it
-          # 
-          # flutter config --enable-web
-          # 
-          #   flutter build web -h
-          #     --release  Build a release version of your app (default mode).
-          #     --pwa-strategy
-          #       [none]  Generate a service worker with no body. This is useful for local testing
-          #       [offline-first] (default)    
-          #         Attempt to cache the application shell eagerly 
-          #           and then lazily cache all subsequent assets as they are loaded.
-          # 
-          #   SEP 2021
-          #   flutter build web -h
-          # 
-          # firebase
-          # - - - -- 
-          # 
-          # npm install -g firebase-tools
-          # 
-          # firebase login
-          # 
-          # npm install -g firebase-tools@7.6.1 
-          # or
-          # npm i firebase-tools@7.6.1
-          # 
-          # firebase login
-          #    it will take you to the screen where you 
-          #      need to verify your firebase account
-          # firebase init
-          #   ANSWER QUESTIONS
-          #     public directory? build/web
-          #     Configure as a single page app? No
-          #     Overwrite 404.html? No
-          #     index already exists. Overwrite? No
-          # 
-          # firebase deploy
-          # firebase open
-          # 
-          # . . . end . . .
-          # 
-          # Hosting URL: 
-          #   https://graphql-pwa-web.app
-          # 
-          # Shivanchal Pandey
-          # Jun 19, 2020
-          # Progressive Web App(PWA) in Flutter
-          # https://medium.flutterdevs.com/progressive-web-app-flutter-62c7dea05fc5
+            # asset_extension: .zip
+            # asset_content_type: application/zip
+            # asset_extension: .aab 
+            # asset_content_type:  application/x-authorware-bin
 
-
-          # No valid code signing certificates were found
-          # ---------------------------------------------
-          # 
-          # flutter build ipa --debug
-          # flutter build ipa --release
-          # 
-          # You should do exactly as the error states.
-          # 
-          # No valid code signing certificates were found
-          # 
-          # Open /{ProjectName}/ios/Runner.xcworkspace
-          # Click the top level runner file on the left
-          # Go to signing & capabilities
-          # Change your team and bundle identifier accordingly.
-          # 
-          # https://stackoverflow.com/questions/63992938/unable-to-perform-flutter-build-ios
-          #
-          # flutter ipa - no certificates needed (no .ipa output)
-          # -----------------------------------------------------
-          # 
-          # flutter build ipa --no-codesign
-          # build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app
-          # 
-          # SEP 2022 - ANDRE EXPERIENCE
-          
           - os: macos-latest
             target: iOS
-            build_mode: no-codesign
+            target_detail: NoCodeSign
             build_target: ipa
+            build_mode: no-codesign
             build_path: build/ios/archive
-            # later figure out the correct . . .
             # asset_extension: .zip
             # asset_content_type: application/zip
             # asset_extension: .ipa 
-            # asset_content_type: application/octet-stream ??
+            # asset_content_type: application/octet-stream  ??
             # asset_extension: .tar.gz
             # asset_content_type: application/gzip
 
@@ -445,7 +214,7 @@ jobs:
       - run: flutter build ${{ matrix.build_target }} --${{ matrix.build_mode }}
 
       - name: Make a dist directory
-        run: mkdir ${{ github.event.repository.name }}_dist 
+        run: mkdir ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist 
 
 #     - name: Configure Keystore for Android
 #       if: matrix.target == 'Android'
@@ -466,40 +235,40 @@ jobs:
         if: matrix.target == 'Android'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
         
       - name: Compress build for macOS
         if: matrix.target == 'macOS'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
         
       - name: Compress build for Web
         if: matrix.target == 'Web'
         run: |
           ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
+          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
 
       - name: Rename build for AppBundle
         if: matrix.target == 'AppBundle'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.aab $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
+          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.aab $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for iOS
         if: matrix.target == 'iOS'
         run: |
-          # ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.zip
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.build_mode }}.tar.gz *
+          # ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}_everything_else_dist
+          name: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
           path: |
-            ${{ github.event.repository.name }}_dist/
+            ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/
