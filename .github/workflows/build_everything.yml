@@ -62,10 +62,10 @@ jobs:
 
     steps:
       # Set up Flutter.
-      - name: Clone Flutter repository with master channel
+      - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
         with:
-          channel: master
+          channel: stable
 
       - name: Install Linux dependencies
         if: matrix.target == 'Linux'
@@ -203,10 +203,10 @@ jobs:
           java-version: 11
           distribution: temurin
       # Set up Flutter.
-      - name: Clone Flutter repository with master channel
+      - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@9d48f4efd5460d7013af812069d08b23f37aed20
         with:
-          channel: master
+          channel: stable
       - run: flutter config --enable-macos-desktop
       - run: flutter doctor
 
