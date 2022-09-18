@@ -125,6 +125,9 @@ jobs:
           path: |
             ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/
 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+
   build_apk_appbundle_ios_macos_web:
     name: Build ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: macos-latest
@@ -272,3 +275,6 @@ jobs:
           name: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}
           path: |
             ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
