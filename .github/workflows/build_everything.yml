@@ -16,7 +16,7 @@ on:
 jobs:
 
   build_windows_linux:
-    name: Build ${{ matrix.target }} ${{ matrix.target_detail }}
+    name: ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: ${{ matrix.os }}
     strategy:
       # Disable fail-fast as we want results from all even if one fails.
@@ -127,9 +127,10 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
 
   build_apk_appbundle_ios_macos_web:
-    name: Build ${{ matrix.target }} ${{ matrix.target_detail }}
+    name: ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: macos-latest
     strategy:
       # Disable fail-fast as we want results from all even if one fails.
@@ -278,3 +279,4 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
