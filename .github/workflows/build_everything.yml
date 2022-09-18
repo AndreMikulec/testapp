@@ -127,7 +127,9 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          files: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*
 
   build_apk_appbundle_ios_macos_web:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
@@ -279,4 +281,6 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          files: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*
