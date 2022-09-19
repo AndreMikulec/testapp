@@ -18,6 +18,34 @@ on:
 
 jobs:
 
+  information_env:
+    name: Knowledge About env
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump github context global data
+        run:   export
+        shell: bash
+
+  information_github:
+    name: Knowledge About github
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump github context global data
+        run:   echo "$GITHUB_CONTEXT"
+        shell: bash
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+  information_ubuntu:
+    name: Knowledge About runner ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump runner context global data
+        run:   echo "$RUNNER_CONTEXT"
+        shell: bash
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+
   build_windows_linux:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: ${{ matrix.os }}
