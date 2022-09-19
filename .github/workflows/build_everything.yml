@@ -126,10 +126,20 @@ jobs:
             ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
+        permissions:
+          contents: write
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          files: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*
+          allowUpdates: true
+          replacesArtifacts: true
+          commit: ${{ env.USER_SHA }}
+          tag: ${{ env.USER_GITHUB_REF_NAME }}
+          artifacts: "${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*"
+          token: ${{ secrets.ACTIONS_CREATE_RELEASE_REPO_SECRET }}
+        env:
+          USER_GITHUB_SHA: ${{ github.sha }}
+          USER_GITHUB_REF_NAME: ${{ github.ref_name }}
 
   build_apk_appbundle_ios_macos_web:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
@@ -280,7 +290,17 @@ jobs:
             ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
+        permissions:
+          contents: write
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          files: ${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*
+          allowUpdates: true
+          replacesArtifacts: true
+          commit: ${{ env.USER_SHA }}
+          tag: ${{ env.USER_GITHUB_REF_NAME }}
+          artifacts: "${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*"
+          token: ${{ secrets.ACTIONS_CREATE_RELEASE_REPO_SECRET }}
+        env:
+          USER_GITHUB_SHA: ${{ github.sha }}
+          USER_GITHUB_REF_NAME: ${{ github.ref_name }}
