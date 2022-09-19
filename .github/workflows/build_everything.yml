@@ -1,20 +1,9 @@
 name: Build Everything
 
-
 permissions:
   contents: write
 
-on:
-  # For manual tests.
-  workflow_dispatch:
-  push:
-#   tags:
-#     - "*" # new tag version, like `0.8.4` or else
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: push
 
 jobs:
 
