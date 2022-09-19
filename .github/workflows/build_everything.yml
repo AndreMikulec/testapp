@@ -1,5 +1,8 @@
 name: Build Everything
-permissions: read-all
+
+
+permissions:
+  contents: write
 
 on:
   # For manual tests.
@@ -127,8 +130,6 @@ jobs:
 
       - name: Release
         if: github.ref_type == 'tag'
-        permissions:
-          contents: write
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
