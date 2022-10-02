@@ -1,0 +1,99 @@
+linux_task:
+#
+# Release Assets
+# https://cirrus-ci.org/examples/#release-assets
+#
+# some default environment variables are pre-defined
+#   CIRRUS_TAG	
+#     Tag name if current build was triggered by a new tag. For example v1.0
+#   CIRRUS_RELEASE
+#     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
+# https://cirrus-ci.org/guide/writing-tasks/
+#     
+# Secured Variables (per repository) 
+#   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
+#   FROM
+#     https://cirrus-ci.com/settings/github/AndreMikulec
+#       Owner-Level Secured Variables 
+#       NOTE . . .
+#       API Settings
+#         Need an API token for scripts or testing? 
+#           https://cirrus-ci.org/api/
+#             Cirrus CI exposes GraphQL API for integrators to use through https://api.cirrus-ci.com/graphql endpoint.
+# OR FROM
+#   https://cirrus-ci.com/github/AndreMikulec/REPOSITORY -> Settings
+#     Secured Variables
+#   https://cirrus-ci.com/github/AndreMikulec/testapp
+#     Secured Variables
+#
+  environment:
+    # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
+    GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
+  name: "arm cimg/base:edge"
+  arm_container:
+    image: cimg/base:edge
+    cpu: 1
+    memory: 1G
+  timeout_in: 5m
+  script:
+    - uname -a
+    - whoami
+    - echo `pwd`
+    - echo ${PATH} || true
+    - ls -l /home/circleci/bin || true
+    - ls -l /home/circleci/.local/bin || true
+    - ls -l /usr/local/sbin || true
+    - ls -l /usr/local/bin || true
+    - ls -l /usr/sbin || true
+    - ls -l /usr/bin || true
+    - ls -l /sbin || true
+    - ls -l /bin || true
+    
+    # OCT 2022
+    # mostly from
+    # https://docs.flutter.dev/get-started/install/linux
+    # . . .
+    
+    # https://zoomadmin.com/HowToInstall/UbuntuPackage/file
+    - sudo apt-get update -y
+    - sudo apt-get install -y file
+    # ONLY if doing: Flutter `test`
+    - sudo apt-get install -y libglu1-mesa
+
+    # OTHERS
+    - sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+    
+    # personal preference
+    # https://linuxhint.com/install-7zip-compression-tool-on-ubuntu/
+    # - sudo apt-get install -y 7zip-full
+    # Unable to locate package 7zip-full
+    
+    # NOTE "cimg/base:edge" DOES HAVE
+    # tar
+    # git
+    # gunzip, unzip, gzip
+        
+    # OPTION 2 OF 2
+    # NOTE: I should put this folder "flutter" ELSEWHERE and not in the PROJECT directory
+    - git clone -b stable –depth 1 https://github.com/flutter/flutter.git 
+    - export PATH="$PATH:`pwd`/flutter/bin"
+    
+    - flutter config --disable-analytics
+    - flutter config --enable-linux-desktop
+    - flutter precache --linux
+    - flutter doctor -v
+
+    - which dart
+    - dart --version
+    - which flutter 
+    - flutter --version
+    
+    - flutter create .
+    - flutter pub get
+    #
+    # I SHOULD NOT HARDCODE THIS
+    - flutter build linux --debug
+    # I SHOULD NOT HARDCODE THIS
+    - zip ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip build/linux/arm64/debug/bundle/*
+    # I SHOULD NOT HARDCODE THIS
+    - ./cirrus-ci-release-assets.sh
