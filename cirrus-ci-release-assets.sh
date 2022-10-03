@@ -2,19 +2,6 @@
 
 # Release Assets
 # https://cirrus-ci.org/examples/#release-assets
-#
-# some default environment variables are pre-defined
-#   CIRRUS_TAG	
-#     Tag name if current build was triggered by a new tag. For example v1.0
-#   CIRRUS_RELEASE
-#     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
-# https://cirrus-ci.org/guide/writing-tasks/
-#
-# Secured Variables (per repository) 
-#   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
-#   FROM
-#     https://cirrus-ci.com/github/AndreMikulec/REPOSITORY -> Settings
-
 
 if [[ "$CIRRUS_RELEASE" == "" ]]; then
   echo "Not a release. No need to deploy!"
