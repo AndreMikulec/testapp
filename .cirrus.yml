@@ -78,7 +78,7 @@ linux_task:
     - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git 
     - export PATH="$PATH:`pwd`/flutter/bin"
     
-    - flutter config --disable-analytics
+    - flutter config --no-analytics
     - flutter config --enable-linux-desktop
     - flutter precache --linux
     - flutter doctor -v
