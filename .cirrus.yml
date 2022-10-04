@@ -39,7 +39,24 @@ linux_task:
     - uname -a
     - whoami
     - echo `pwd`
+    - ls -alrt
     - echo ${PATH} || true
+
+    #
+    # uname -a
+    # Linux cirrus-ci-task-6527987532169216 5.4.209-116.367.amzn2.aarch64 #1 SMP Wed Aug 31 00:10:02 UTC 2022 aarch64 aarch64 aarch64 GNU/Linux
+    # whoami
+    # circleci
+    # echo `pwd`
+    # /tmp/cirrus-ci-build
+    # echo ${PATH} || true
+    # /home/circleci/bin:/home/circleci/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    # 
+    # EARLY OCT 2022
+    # https://download.docker.com/linux/ubuntu jammy InRelease
+    # http://ports.ubuntu.com/ubuntu-ports jammy*
+    #
+
     - ls -l /home/circleci/bin || true
     - ls -l /home/circleci/.local/bin || true
     - ls -l /usr/local/sbin || true
@@ -73,10 +90,16 @@ linux_task:
     # git
     # gunzip, unzip, gzip
         
+    # avoid "cirrus-ci-build" is not a valid Dart package name
+    - cd ..
+    - mv cirrus-ci-build $CIRRUS_REPO_NAME
+    - cd $CIRRUS_REPO_NAME
+        
     # OPTION 2 OF 2
-    # NOTE: I should put this folder "flutter" ELSEWHERE and not in the PROJECT directory
+    # HARD NOTE: I should put this folder "flutter" ELSEWHERE and not in the PROJECT directory
+    #
     - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git 
-    - export PATH="$PATH:`pwd`/flutter/bin"
+    - export PATH="$PATH:`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin"
     
     - flutter config --no-analytics
     - flutter config --enable-linux-desktop
@@ -93,6 +116,12 @@ linux_task:
     #
     # I SHOULD NOT HARDCODE THIS
     - flutter build linux --debug
+    
+    # reverse out of avoid "cirrus-ci-build" is not a valid Dart package name
+    - cd ..
+    - mv $CIRRUS_REPO_NAME cirrus-ci-build
+    - cd cirrus-ci-build
+    
     # I SHOULD NOT HARDCODE THIS
     - zip ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip build/linux/arm64/debug/bundle/*
     # I SHOULD NOT HARDCODE THIS
