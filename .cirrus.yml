@@ -115,7 +115,7 @@ linux_task:
     - flutter pub get
     #
     # I SHOULD NOT HARDCODE THIS
-    - flutter build linux --debug
+    - flutter build linux --debug -v
     
     # reverse out of avoid "cirrus-ci-build" is not a valid Dart package name
     - cd ..
