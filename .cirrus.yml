@@ -96,4 +96,5 @@ linux_task:
     # I SHOULD NOT HARDCODE THIS
     - zip ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip build/linux/arm64/debug/bundle/*
     # I SHOULD NOT HARDCODE THIS
+    - chmod u+x cirrus-ci-release-assets.sh
     - ./cirrus-ci-release-assets.sh
