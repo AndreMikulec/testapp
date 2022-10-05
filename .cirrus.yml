@@ -126,6 +126,11 @@ linux_task:
     
     # I SHOULD NOT HARDCODE THIS
     - zip ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip build/linux/arm64/debug/bundle/*
+    
+    # env: bash\r: No such file or directory [duplicate]
+    # 2015 seen 2022
+    # https://stackoverflow.com/questions/29045140/env-bash-r-no-such-file-or-directory
+    - sed -i $'s/\r$//' cirrus-ci-release-assets.sh
     # I SHOULD NOT HARDCODE THIS
     - chmod u+x cirrus-ci-release-assets.sh
     - ./cirrus-ci-release-assets.sh
