@@ -70,6 +70,8 @@ linux_task:
     
     # OCT 2022
     # mostly from
+    # Linux install
+    # * Install Flutter manually * section
     # https://docs.flutter.dev/get-started/install/linux
     # . . .
     
@@ -82,6 +84,12 @@ linux_task:
     # OTHERS
     - sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
     
+    # add
+    # Building Linux apps with Flutter
+    # * Preparing Linux apps for distribution * section
+    # https://docs.flutter.dev/development/platform-integration/linux/building
+    - sudo apt-get install libgtk-3-0 libblkid1 liblzma5
+
     # personal preference
     # https://linuxhint.com/install-7zip-compression-tool-on-ubuntu/
     # - sudo apt-get install -y 7zip-full
