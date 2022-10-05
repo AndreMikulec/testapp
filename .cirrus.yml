@@ -29,9 +29,9 @@ linux_task:
   environment:
     # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
     GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
-  name: "arm cimg/base:edge"
+  name: "arm gcc:latest"
   arm_container:
-    image: cimg/base:edge
+    image: gcc:latest
     cpu: 1
     memory: 1G
   timeout_in: 5m
@@ -44,7 +44,8 @@ linux_task:
 
     #
     # uname -a
-    # Linux cirrus-ci-task-6527987532169216 5.4.209-116.367.amzn2.aarch64 #1 SMP Wed Aug 31 00:10:02 UTC 2022 aarch64 aarch64 aarch64 GNU/Linux
+    # gcc: latest
+    # ? ? ?
     # whoami
     # circleci
     # echo `pwd`
@@ -53,8 +54,9 @@ linux_task:
     # /home/circleci/bin:/home/circleci/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     # 
     # EARLY OCT 2022
-    # https://download.docker.com/linux/ubuntu jammy InRelease
-    # http://ports.ubuntu.com/ubuntu-ports jammy*
+    # gcc: latest
+    # ? ? ? repo software paths
+    # ? ? ? repo software paths
     #
 
     - ls -l /home/circleci/bin || true
@@ -85,23 +87,19 @@ linux_task:
     # - sudo apt-get install -y 7zip-full
     # Unable to locate package 7zip-full
     
-    # NOTE "cimg/base:edge" DOES HAVE
-    # tar
-    # git
-    # gunzip, unzip, gzip
-        
-    # avoid "cirrus-ci-build" is not a valid Dart package name
-    - cd ..
-    - mv cirrus-ci-build $CIRRUS_REPO_NAME
-    - cd $CIRRUS_REPO_NAME
+    # NOTE "gcc:latest" DOES HAVE
+    # tar ?
+    # git ?
+    # gunzip ?, unzip ?, gzip ?
         
     # OPTION 2 OF 2
     # HARD NOTE: I should put this folder "flutter" ELSEWHERE and not in the PROJECT directory
     #
-    - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git 
-    - export PATH="$PATH:`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin"
+    - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /flutter
+    - export PATH="$PATH:/flutter/bin:/flutter/bin/cache/dart-sdk/bin"
     
     - flutter config --no-analytics
+    - flutter config --no-enable-web
     - flutter config --enable-linux-desktop
     - flutter precache --linux
     - flutter doctor -v
@@ -111,16 +109,14 @@ linux_task:
     - which flutter 
     - flutter --version
     
-    - flutter create .
+    # - flutter create .
+    # avoid "cirrus-ci-build" is not a valid Dart package name
+    - flutter create --project-name $CIRRUS_REPO_NAME
+
     - flutter pub get
     #
     # I SHOULD NOT HARDCODE THIS
     - flutter build linux --debug -v
-    
-    # reverse out of avoid "cirrus-ci-build" is not a valid Dart package name
-    - cd ..
-    - mv $CIRRUS_REPO_NAME cirrus-ci-build
-    - cd cirrus-ci-build
     
     # I SHOULD NOT HARDCODE THIS
     - zip ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip build/linux/arm64/debug/bundle/*
