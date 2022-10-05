@@ -93,8 +93,8 @@ linux_task:
     # gunzip, unzip, gzip
         
     # OPTION 2 OF 2
-    - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /flutter
-    - export PATH="$PATH:/flutter/bin:/flutter/bin/cache/dart-sdk/bin"
+    - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /tmp/flutter
+    - export PATH="$PATH:/tmp/flutter/bin:/tmp/flutter/bin/cache/dart-sdk/bin"
     
     - flutter config --no-analytics
     - flutter config --no-enable-web
