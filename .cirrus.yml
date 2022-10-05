@@ -32,8 +32,8 @@ linux_task:
   name: "arm cimg/base:edge"
   arm_container:
     image: cimg/base:edge
-    cpu: 1
-    memory: 1G
+    cpu: 4
+    memory: 8G
   timeout_in: 5m
   script:
     - uname -a
