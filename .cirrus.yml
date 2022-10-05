@@ -109,7 +109,7 @@ linux_task:
     
     # - flutter create .
     # avoid "cirrus-ci-build" is not a valid Dart package name
-    - flutter create --project-name $CIRRUS_REPO_NAME
+    - flutter create --project-name $CIRRUS_REPO_NAME .
 
     - flutter pub get
     #
