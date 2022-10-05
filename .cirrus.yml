@@ -29,9 +29,9 @@ linux_task:
   environment:
     # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
     GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
-  name: "arm gcc:latest"
+  name: "arm cimg/base:edge"
   arm_container:
-    image: gcc:latest
+    image: cimg/base:edge
     cpu: 1
     memory: 1G
   timeout_in: 5m
@@ -45,7 +45,7 @@ linux_task:
     #
     # uname -a
     # gcc: latest
-    # ? ? ?
+    # Linux cirrus-ci-task-6527987532169216 5.4.209-116.367.amzn2.aarch64 #1 SMP Wed Aug 31 00:10:02 UTC 2022 aarch64 aarch64 aarch64
     # whoami
     # circleci
     # echo `pwd`
@@ -54,9 +54,9 @@ linux_task:
     # /home/circleci/bin:/home/circleci/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     # 
     # EARLY OCT 2022
-    # gcc: latest
-    # ? ? ? repo software paths
-    # ? ? ? repo software paths
+    # cimg/base:edge
+    # https://download.docker.com/linux/ubuntu jammy InRelease
+    # http://ports.ubuntu.com/ubuntu-ports jammy*
     #
 
     - ls -l /home/circleci/bin || true
@@ -87,14 +87,12 @@ linux_task:
     # - sudo apt-get install -y 7zip-full
     # Unable to locate package 7zip-full
     
-    # NOTE "gcc:latest" DOES HAVE
-    # tar ?
-    # git ?
-    # gunzip ?, unzip ?, gzip ?
+    # NOTE "cimg/base:edge" DOES HAVE
+    # tar
+    # git
+    # gunzip, unzip, gzip
         
     # OPTION 2 OF 2
-    # HARD NOTE: I should put this folder "flutter" ELSEWHERE and not in the PROJECT directory
-    #
     - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /flutter
     - export PATH="$PATH:/flutter/bin:/flutter/bin/cache/dart-sdk/bin"
     
