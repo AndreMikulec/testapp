@@ -58,9 +58,9 @@ linuxarm64_build_task:
     - whoami
     - echo `pwd`
     - echo CIRRUS_REPO_FULL_NAME: $CIRRUS_REPO_FULL_NAME
-    - echo      CIRRUS_REPO_NAME: $CIRRUS_REPO_NAME
-    - echo            CIRRUS_TAG: $CIRRUS_TAG
-    - echo    CIRRUS_WORKING_DIR: $CIRRUS_WORKING_DIR
+    - echo CIRRUS_REPO_NAME: $CIRRUS_REPO_NAME
+    - echo CIRRUS_TAG: $CIRRUS_TAG
+    - echo CIRRUS_WORKING_DIR: $CIRRUS_WORKING_DIR
     - ls -alrt
     - echo ${PATH} || true
 
@@ -120,6 +120,10 @@ linuxarm64_build_task:
     # - sudo apt-get install -y 7zip-full
     # Unable to locate package 7zip-full
 
+    # DEEPLY CONSIDER
+    # Download	.tar.xz	64-bit Linux arm64
+    # https://www.7-zip.org/download.html
+
     # NOTE "cimg/base:edge" DOES HAVE
     # tar
     # git
@@ -165,10 +169,9 @@ linuxarm64_build_task:
     # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
     # I SHOULD NOT HARDCODE THIS
     - pushd build/linux/arm64/debug/bundle
-    # I SHOULD NOT HARDCODE THIS (REALLY BUGGY! DOES NOT LIKE MANY zipped FILE NAMES)
-    - which zip
-    - zip   –rTv ZIPPED.zip ./
-    - mv         ZIPPED.zip $CIRRUS_WORKING_DIR\${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
+    # I SHOULD NOT HARDCODE THIS (ubuntu zip EXECUTABLE IS BAD BUG BAD BUG)
+    - tar -zcvf archive.tar.gz ./ 
+    - mv        archive.tar.gz $CIRRUS_WORKING_DIR\${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz
     - popd
 
     ## # Release Assets
@@ -191,8 +194,8 @@ linuxarm64_build_task:
     # Default to cirrus-ci-build folder inside of a system's temporary folder.
     # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
     #
-    path: "*.zip"
-    type: application/zip
+    path: "*.tar.gz"
+    type: application/gzip
 
 
   # release # Much is based on
@@ -283,11 +286,11 @@ linuxarm64_build_task:
 
     echo "GitHub release '$CIRRUS_TAG' found. Preparing asset files to upload..."
 
-    file_content_type="application/zip"
+    file_content_type="application/gzip"
     files_to_upload=(
       # relative paths of assets to upload
       # I SHOULD NOT HARDCODE THIS
-      ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
+      ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz
     )
     for fpath in "${files_to_upload[@]}"
     do
