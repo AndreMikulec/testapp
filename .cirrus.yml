@@ -1,34 +1,8 @@
-linux_task:
-#
-# Release Assets
-# https://cirrus-ci.org/examples/#release-assets
-#
-# some default environment variables are pre-defined
-#   CIRRUS_TAG	
-#     Tag name if current build was triggered by a new tag. For example v1.0
-#   CIRRUS_RELEASE
-#     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
-# https://cirrus-ci.org/guide/writing-tasks/
-#     
-# Secured Variables (per repository) 
-#   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
-#   FROM
-#     https://cirrus-ci.com/settings/github/AndreMikulec
-#       Owner-Level Secured Variables 
-#       NOTE . . .
-#       API Settings
-#         Need an API token for scripts or testing? 
-#           https://cirrus-ci.org/api/
-#             Cirrus CI exposes GraphQL API for integrators to use through https://api.cirrus-ci.com/graphql endpoint.
-# OR FROM
-#   https://cirrus-ci.com/github/AndreMikulec/REPOSITORY -> Settings
-#     Secured Variables
-#   https://cirrus-ci.com/github/AndreMikulec/testapp
-#     Secured Variables
-#
-  environment:
-    # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
-    GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
+
+
+
+# I SHOULD NOT HARDCODE THIS
+linuxarm64_build_task:
   name: "arm cimg/base:edge"
   arm_container:
     image: cimg/base:edge
@@ -129,10 +103,13 @@ linux_task:
     - ls -alrt build/linux/arm64/debug/bundle
     # I SHOULD NOT HARDCODE THIS
     - ls -alrt build/linux/arm64/debug/bundle/$CIRRUS_REPO_NAME
-    
+
     # I SHOULD NOT HARDCODE THIS
-    - zip ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip build/linux/arm64/debug/bundle/*
-    
+    - pushd build/linux/arm64/debug/bundle
+    # I SHOULD NOT HARDCODE THIS
+    - zip –r ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
+    - popd
+
     # env: bash\r: No such file or directory [duplicate]
     # 2015 seen 2022
     # https://stackoverflow.com/questions/29045140/env-bash-r-no-such-file-or-directory
@@ -141,10 +118,63 @@ linux_task:
     - chmod u+x cirrus-ci-release-assets.sh
     - ./cirrus-ci-release-assets.sh
 
-  artifacts:
+  zipped_artifacts:
+  
+    # accepts a glob pattern of files relative to $CIRRUS_WORKING_DIR
+    # https://cirrus-ci.org/guide/writing-tasks/#artifacts-instruction
+    #
     # CIRRUS_WORKING_DIR	cirrus-ci-build folder inside of a system's temporary folder	
     # Working directory where Cirrus CI executes builds. 
     # Default to cirrus-ci-build folder inside of a system's temporary folder.
     # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
+    #
     path: "*.zip"
+    type: application/zip
+
+
+# I SHOULD NOT HARDCODE THIS
+linuxarm64_release_task:
+#
+# Release Assets
+# https://cirrus-ci.org/examples/#release-assets
+#
+# some default environment variables are pre-defined
+#   CIRRUS_TAG	
+#     Tag name if current build was triggered by a new tag. For example v1.0
+#   CIRRUS_RELEASE
+#     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
+# https://cirrus-ci.org/guide/writing-tasks/
+# 
+# CIRRUS_TAG	Tag name if current build was triggered by a new tag. For example v1.0
+# CIRRUS_RELEASE	GitHub Release id if current tag was created for a release
+# https://cirrus-ci.org/guide/writing-tasks/#environment-variables
+# 
+#   # the case seems, in a separate task, 
+#   #  that I have to set this CIRRUS_RELEASE value myself
+#   filename:.cirrus.yml CIRRUS_RELEASE
+#   https://github.com/search?q=filename%3A.cirrus.yml+CIRRUS_RELEASE
+# 
+# Secured Variables (per repository) 
+#   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
+#   FROM
+#     https://cirrus-ci.com/settings/github/AndreMikulec
+#       Owner-Level Secured Variables 
+#       NOTE . . .
+#       API Settings
+#         Need an API token for scripts or testing? 
+#           https://cirrus-ci.org/api/
+#             Cirrus CI exposes GraphQL API for integrators to use through https://api.cirrus-ci.com/graphql endpoint.
+# OR FROM
+#   https://cirrus-ci.com/github/AndreMikulec/REPOSITORY -> Settings
+#     Secured Variables
+#   https://cirrus-ci.com/github/AndreMikulec/testapp
+#     Secured Variables
+#
+  environment:
+    # That's why you need to create a personal access token with full access to repo scope. (NOT_YET_VERIFIED)
+    # https://cirrus-ci.org/examples/#release-assets
+    # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
+    GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
+
+
 
