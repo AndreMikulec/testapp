@@ -171,7 +171,7 @@ linuxarm64_build_task:
     # I SHOULD NOT HARDCODE THIS 
     - cd build/linux/arm64/debug/bundle
     # I SHOULD NOT HARDCODE THIS 
-    - tar -zcvf ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz *
+    - tar -zcvf $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz *
     - cd $CIRRUS_WORKING_DIR
 
     ## # Release Assets
