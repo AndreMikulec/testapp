@@ -164,16 +164,11 @@ linuxarm64_build_task:
     # 2015 SEEN OCT 2022
     # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
     # I SHOULD NOT HARDCODE THIS
-    - cd build/linux/arm64/debug/bundle
-    - pwd
-    # I SHOULD NOT HARDCODE THIS (SEEMS can not have a PATH in the zip file name)
-    - zip   –rv ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
-    - ls  -alrt ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
-    - zip   -Tv ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
-    - mv        ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip $CIRRUS_WORKING_DIR
-    - cd                                                 $CIRRUS_WORKING_DIR
-    - ls  -alrt ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
-    - pwd
+    - pushd build/linux/arm64/debug/bundle
+    # I SHOULD NOT HARDCODE THIS (REALLY BUGGY! DOES NOT LIKE MANY zipped FILE NAMES)
+    - zip   –rTv ZIPPED.zip *
+    - mv         ZIPPED.zip $CIRRUS_WORKING_DIR\${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
+    - popd
 
     ## # Release Assets
     ## # https://cirrus-ci.org/examples/#release-assets
