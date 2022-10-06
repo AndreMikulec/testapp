@@ -166,7 +166,8 @@ linuxarm64_build_task:
     # I SHOULD NOT HARDCODE THIS
     - pushd build/linux/arm64/debug/bundle
     # I SHOULD NOT HARDCODE THIS (REALLY BUGGY! DOES NOT LIKE MANY zipped FILE NAMES)
-    - zip   –rTv ZIPPED.zip *
+    - which zip
+    - zip   –rTv ZIPPED.zip ./
     - mv         ZIPPED.zip $CIRRUS_WORKING_DIR\${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - popd
 
