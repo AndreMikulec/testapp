@@ -7,7 +7,7 @@ linuxarm64_build_task:
   arm_container:
     image: cimg/base:edge
     cpu: 2
-    # if [   +6 ms] FAILED: /tmp/cirrus-ci-build/linux/flutter/ephemeral/libflutter_linux_gtk.so 
+    # if [   +6 ms] FAILED: /tmp/cirrus-ci-build/linux/flutter/ephemeral/libflutter_linux_gtk.so
     #   then MAYBE!?!not enough memory
     memory: 2G
   timeout_in: 5m
@@ -28,7 +28,7 @@ linuxarm64_build_task:
     # /tmp/cirrus-ci-build
     # echo ${PATH} || true
     # /home/circleci/bin:/home/circleci/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    # 
+    #
     # EARLY OCT 2022
     # cimg/base:edge
     # https://download.docker.com/linux/ubuntu jammy InRelease
@@ -43,14 +43,14 @@ linuxarm64_build_task:
     - ls -l /usr/bin || true
     - ls -l /sbin || true
     - ls -l /bin || true
-    
+
     # OCT 2022
     # mostly from
     # Linux install
     # * Install Flutter manually * section
     # https://docs.flutter.dev/get-started/install/linux
     # . . .
-    
+
     # https://zoomadmin.com/HowToInstall/UbuntuPackage/file
     - sudo apt-get update -y
     - sudo apt-get install -y file
@@ -59,7 +59,7 @@ linuxarm64_build_task:
 
     # OTHERS
     - sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
-    
+
     # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
     # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
     # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
@@ -73,7 +73,7 @@ linuxarm64_build_task:
     # https://linuxhint.com/install-7zip-compression-tool-on-ubuntu/
     # - sudo apt-get install -y 7zip-full
     # Unable to locate package 7zip-full
-    
+
     # NOTE "cimg/base:edge" DOES HAVE
     # tar
     # git
@@ -83,12 +83,12 @@ linuxarm64_build_task:
     # Windows
     # jq 1.6 executables for 64-bit or 32-bit.
     # https://stedolan.github.io/jq/manual/
-    # jq  # determine CIRRUS_RELEASE and curl uses CIRRUS_REPO_FULL_NAME CIRRUS_TAG and possibly GITHUB_TOKEN 
-        
+    # jq  # determine CIRRUS_RELEASE and curl uses CIRRUS_REPO_FULL_NAME CIRRUS_TAG and possibly GITHUB_TOKEN
+
     # OPTION 2 OF 2
     - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /tmp/flutter
     - export PATH="$PATH:/tmp/flutter/bin:/tmp/flutter/bin/cache/dart-sdk/bin"
-    
+
     - flutter config --no-analytics
     - flutter config --no-enable-web
     - flutter config --enable-linux-desktop
@@ -97,9 +97,9 @@ linuxarm64_build_task:
 
     - which dart
     - dart --version
-    - which flutter 
+    - which flutter
     - flutter --version
-    
+
     # - flutter create .
     # avoid "cirrus-ci-build" is not a valid Dart package name
     - flutter create --project-name $CIRRUS_REPO_NAME .
@@ -128,12 +128,12 @@ linuxarm64_build_task:
     - ./cirrus-ci-release-assets.sh
 
   zipped_artifacts:
-  
+
     # accepts a glob pattern of files relative to $CIRRUS_WORKING_DIR
     # https://cirrus-ci.org/guide/writing-tasks/#artifacts-instruction
     #
-    # CIRRUS_WORKING_DIR	cirrus-ci-build folder inside of a system's temporary folder	
-    # Working directory where Cirrus CI executes builds. 
+    # CIRRUS_WORKING_DIR	cirrus-ci-build folder inside of a system's temporary folder
+    # Working directory where Cirrus CI executes builds.
     # Default to cirrus-ci-build folder inside of a system's temporary folder.
     # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
     #
@@ -148,29 +148,29 @@ linuxarm64_release_task:
 # https://cirrus-ci.org/examples/#release-assets
 #
 # some default environment variables are pre-defined
-#   CIRRUS_TAG	
+#   CIRRUS_TAG
 #     Tag name if current build was triggered by a new tag. For example v1.0
 #   CIRRUS_RELEASE
 #     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
 # https://cirrus-ci.org/guide/writing-tasks/
-# 
+#
 # CIRRUS_TAG	Tag name if current build was triggered by a new tag. For example v1.0
 # CIRRUS_RELEASE	GitHub Release id if current tag was created for a release
 # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
-# 
-#   # the case seems, in a separate task, 
+#
+#   # the case seems, in a separate task,
 #   #  that I have to set this CIRRUS_RELEASE value myself
 #   filename:.cirrus.yml CIRRUS_RELEASE
 #   https://github.com/search?q=filename%3A.cirrus.yml+CIRRUS_RELEASE
-# 
-# Secured Variables (per repository) 
+#
+# Secured Variables (per repository)
 #   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
 #   FROM
 #     https://cirrus-ci.com/settings/github/AndreMikulec
-#       Owner-Level Secured Variables 
+#       Owner-Level Secured Variables
 #       NOTE . . .
 #       API Settings
-#         Need an API token for scripts or testing? 
+#         Need an API token for scripts or testing?
 #           https://cirrus-ci.org/api/
 #             Cirrus CI exposes GraphQL API for integrators to use through https://api.cirrus-ci.com/graphql endpoint.
 # OR FROM
@@ -186,8 +186,8 @@ linuxarm64_release_task:
     # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
     GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
 
-  # release # Much is based on 
-  
+  # release # Much is based on
+
   # https://github.com/SciQLop/CDFpp/blob/db9949947a20f2aa42985168645088a82ee9241f/.cirrus.yml
   # EXACTLY FROM
   # https://github.com/joseluisq/paket/blob/5708e9b56ee9a3f871ca1ae8c679350083064069/.cirrus.yml
@@ -202,13 +202,13 @@ linuxarm64_release_task:
   #   -H "Accept: application/vnd.github+json" \
   #   -H "Authorization: Bearer <YOUR-TOKEN>" \
   #   https://api.github.com/repos/OWNER/REPO/releases/tags/TAG
-  # 
+  #
   # Get a release by tag name
   # OCT 2022
   # https://docs.github.com/en/rest/releases/release
 
   # NON-DIRECT REPLICATE THIS TEST MANUALLY
-  # Error “curl: (60) SSL certificate problem: unable to get local issuer certificate” 
+  # Error “curl: (60) SSL certificate problem: unable to get local issuer certificate”
   # can be seen when the SSL certificate on the server is not verified or properly configured.
   # SEEN OCT 2022
   # https://matomo.org/faq/troubleshooting/what-to-do-when-you-see-curl-60-ssl-certificate-problem-unable-to-get-local-issuer-certificate-error
@@ -243,7 +243,7 @@ linuxarm64_release_task:
   upload_script: |
     #!/usr/bin/env bash
     set -e
-    
+
     if [[ "$CIRRUS_TAG" == "" ]]; then
       echo "Not tagged. Not a release. No need to deploy!"
       exit 0
@@ -253,7 +253,7 @@ linuxarm64_release_task:
       echo "GitHub access token GITHUB_TOKEN env is not provided!"
       exit 1
     fi
-    
+
     RETRIES=0
     until [ $RETRIES -eq 20 ]
     do
@@ -263,14 +263,14 @@ linuxarm64_release_task:
       RETRIES=$((RETRIES+1))
       sleep 30
     done
-    
+
     if [[ "$CIRRUS_RELEASE" == "null" ]]; then
         echo "Can not find the associated GitHub '$CIRRUS_TAG' release!"
         exit 1
     fi
-    
+
     echo "GitHub release '$CIRRUS_TAG' found. Preparing asset files to upload..."
-    
+
     file_content_type="application/zip"
     files_to_upload=(
       # relative paths of assets to upload
@@ -288,8 +288,7 @@ linuxarm64_release_task:
         --header "Content-Type: $file_content_type" \
         $url_to_upload
     done
-    
+
     echo
-    
     echo "GitHub release '$CIRRUS_TAG' assets uploaded successfully."
 
