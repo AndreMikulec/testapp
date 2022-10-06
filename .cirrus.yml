@@ -168,9 +168,9 @@ linuxarm64_build_task:
     # 2015 SEEN OCT 2022
     # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
     # I (ubuntu zip EXECUTABLE IS BAD BUG BAD BUG)
-    # I SHOULD NOT HARDCODE THIS 
+    # I SHOULD NOT HARDCODE THIS
     - cd build/linux/arm64/debug/bundle
-    # I SHOULD NOT HARDCODE THIS 
+    # I SHOULD NOT HARDCODE THIS
     - tar -zcvf $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz *
     - cd $CIRRUS_WORKING_DIR
 
@@ -198,9 +198,15 @@ linuxarm64_build_task:
     type: application/gzip
 
   # release # Much is based on
-  
+
   # Release Assets
   # https://cirrus-ci.org/examples/#release-assets
+
+  # Create a Release / Get a release by tag name
+  # OCT 2022
+  # https://docs.github.com/en/rest/releases/release
+  # https://docs.github.com/en/rest/releases/releases#create-a-release
+  # https://docs.github.com/en/rest/releases/releases#get-a-release-by-tag-name
 
   # https://github.com/SciQLop/CDFpp/blob/db9949947a20f2aa42985168645088a82ee9241f/.cirrus.yml
   # EXACTLY FROM
@@ -212,14 +218,18 @@ linuxarm64_build_task:
   #
   # https://github.com/pmav99/poetry11/blob/68649946fe09d52ed1a5844bda6690ba6327c408/.cirrus.yml
 
+  # CREATE A NEW GITHUB RELEASE (IF EXISTS, GITHUB WILL REJECT WITH A RETURN MESSAGE)
+  # Proper Ways to Pass Environment Variables in JSON for cURL POST
+  # Dec 5, 2019
+  # SEEN OCT 2022
+  # https://towardsdatascience.com/proper-ways-to-pass-environment-variables-in-json-for-curl-post-f797d2698bf3
+  # # ANDRE ALSO ADD IF A MEMORY LEAK HAPPENS IN TE RELEASE name or BODY then do . . .
+  # # "name":"'"$CIRRUS_TAG"'", "body":"Production '"$CIRRUS_TAG"'"
+
   # curl \
   #   -H "Accept: application/vnd.github+json" \
   #   -H "Authorization: Bearer <YOUR-TOKEN>" \
   #   https://api.github.com/repos/OWNER/REPO/releases/tags/TAG
-  #
-  # Get a release by tag name
-  # OCT 2022
-  # https://docs.github.com/en/rest/releases/release
 
   # NON-DIRECT REPLICATE THIS TEST MANUALLY IS TOUGH
   # Error “curl: (60) SSL certificate problem: unable to get local issuer certificate”
@@ -268,6 +278,19 @@ linuxarm64_build_task:
       exit 1
     fi
 
+    # The release must already exist, so try to create a release
+    # If the release already exists, then nothing changes
+
+    curl \
+      --insecure \
+      -X POST \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer $GITHUB_TOKEN" \
+      https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases \
+      -d '{"tag_name":"'"$CIRRUS_TAG"'"}' || true
+
+    # The release must already exist
+    #
     RETRIES=0
     until [ $RETRIES -eq 20 ]
     do
@@ -296,7 +319,9 @@ linuxarm64_build_task:
       echo "Uploading GitHub release asset '$fpath'..."
       name=$(basename "$fpath")
       url_to_upload="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$name"
-      curl -LX POST \
+      curl \
+        --insecure \
+        -LX POST \
         --data-binary @$fpath \
         --header "Authorization: token $GITHUB_TOKEN" \
         --header "Content-Type: $file_content_type" \
