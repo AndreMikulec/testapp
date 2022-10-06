@@ -1,8 +1,4 @@
 linuxarm64_build_task:
-  filters:  # required since `deploy` has tag filters AND requires `build`
-    tags:
-      only: /.*/
-
   # I SHOULD NOT HARDCODE THAT ABOVE
   # If fails to build THEN check THIS OUT
   # https://cirrus-ci.com/github/AndreMikulec/testapp
