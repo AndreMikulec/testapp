@@ -165,7 +165,7 @@ linuxarm64_build_task:
     # I SHOULD NOT HARDCODE THIS
     - zip   –rv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
     - ls  -alrt $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
-    - ls    -Tv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
+    - zip   -Tv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - popd
     - pwd
 
