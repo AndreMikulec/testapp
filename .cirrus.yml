@@ -168,10 +168,8 @@ linuxarm64_build_task:
     # 2015 SEEN OCT 2022
     # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
     # I SHOULD NOT HARDCODE THIS
-    - pushd build/linux/arm64/debug/bundle
     # I SHOULD NOT HARDCODE THIS (ubuntu zip EXECUTABLE IS BAD BUG BAD BUG)
-    - tar -zcvf $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz ./       
-    - popd
+    - tar -zcvf ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz build/linux/arm64/debug/bundle     
 
     ## # Release Assets
     ## # https://cirrus-ci.org/examples/#release-assets
@@ -195,7 +193,6 @@ linuxarm64_build_task:
     #
     path: "*.tar.gz"
     type: application/gzip
-
 
   # release # Much is based on
   
