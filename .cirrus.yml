@@ -57,7 +57,10 @@ linuxarm64_build_task:
     - uname -a
     - whoami
     - echo `pwd`
-    - echo CIRRUS_TAG: $CIRRUS_TAG
+    - echo CIRRUS_REPO_FULL_NAME: $CIRRUS_REPO_FULL_NAME
+    - echo      CIRRUS_REPO_NAME: $CIRRUS_REPO_NAME
+    - echo            CIRRUS_TAG: $CIRRUS_TAG
+    - echo    CIRRUS_WORKING_DIR: $CIRRUS_WORKING_DIR
     - ls -alrt
     - echo ${PATH} || true
 
@@ -158,9 +161,13 @@ linuxarm64_build_task:
 
     # I SHOULD NOT HARDCODE THIS
     - pushd build/linux/arm64/debug/bundle
+    - pwd
     # I SHOULD NOT HARDCODE THIS
-    - zip –r $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
+    - zip   –rv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
+    - ls  -alrt $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
+    - ls    -Tv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - popd
+    - pwd
 
     ## # Release Assets
     ## # https://cirrus-ci.org/examples/#release-assets
