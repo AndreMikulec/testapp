@@ -20,7 +20,7 @@ file_content_type="application/octet-stream"
 files_to_upload=(
   # relative paths of assets to upload
   # I SHOULD NOT HARDCODE THIS
-  ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip
+  ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
 )
 
 for fpath in $files_to_upload

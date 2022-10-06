@@ -33,6 +33,8 @@ linux_task:
   arm_container:
     image: cimg/base:edge
     cpu: 2
+    # if [   +6 ms] FAILED: /tmp/cirrus-ci-build/linux/flutter/ephemeral/libflutter_linux_gtk.so 
+    #   then MAYBE!?!not enough memory
     memory: 2G
   timeout_in: 5m
   script:
@@ -123,9 +125,13 @@ linux_task:
     #
     # I SHOULD NOT HARDCODE THIS
     - flutter build linux --debug -v
+    # I SHOULD NOT HARDCODE THIS
+    - ls -alrt build/linux/arm64/debug/bundle
+    # I SHOULD NOT HARDCODE THIS
+    - ls -alrt build/linux/arm64/debug/bundle/$CIRRUS_REPO_NAME
     
     # I SHOULD NOT HARDCODE THIS
-    - zip ${CIRRUS_REPO_NAME}_Linux_ARM64_Debug.zip build/linux/arm64/debug/bundle/*
+    - zip ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip build/linux/arm64/debug/bundle/*
     
     # env: bash\r: No such file or directory [duplicate]
     # 2015 seen 2022
@@ -134,3 +140,11 @@ linux_task:
     # I SHOULD NOT HARDCODE THIS
     - chmod u+x cirrus-ci-release-assets.sh
     - ./cirrus-ci-release-assets.sh
+
+  artifacts:
+    # CIRRUS_WORKING_DIR	cirrus-ci-build folder inside of a system's temporary folder	
+    # Working directory where Cirrus CI executes builds. 
+    # Default to cirrus-ci-build folder inside of a system's temporary folder.
+    # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
+    path: "*.zip"
+
