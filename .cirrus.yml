@@ -159,16 +159,18 @@ linuxarm64_build_task:
     # I SHOULD NOT HARDCODE THIS
     - pushd build/linux/arm64/debug/bundle
     # I SHOULD NOT HARDCODE THIS
-    - zip –r ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
+    - zip –r $CIRRUS_WORKING_DIR\${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
     - popd
 
-    # env: bash\r: No such file or directory [duplicate]
-    # 2015 seen 2022
-    # https://stackoverflow.com/questions/29045140/env-bash-r-no-such-file-or-directory
-    - sed -i $'s/\r$//' cirrus-ci-release-assets.sh
-    # I SHOULD NOT HARDCODE THIS
-    - chmod u+x cirrus-ci-release-assets.sh
-    - ./cirrus-ci-release-assets.sh
+    ## # Release Assets
+    ## # https://cirrus-ci.org/examples/#release-assets
+    ## # env: bash\r: No such file or directory [duplicate]
+    ## # 2015 seen 2022
+    ## # https://stackoverflow.com/questions/29045140/env-bash-r-no-such-file-or-directory
+    ## - sed -i $'s/\r$//' cirrus-ci-release-assets.sh
+    ## # I SHOULD NOT HARDCODE THIS
+    ## - chmod u+x cirrus-ci-release-assets.sh
+    ## - ./cirrus-ci-release-assets.sh
 
   zipped_artifacts:
 
@@ -185,6 +187,9 @@ linuxarm64_build_task:
 
 
   # release # Much is based on
+  
+  # Release Assets
+  # https://cirrus-ci.org/examples/#release-assets
 
   # https://github.com/SciQLop/CDFpp/blob/db9949947a20f2aa42985168645088a82ee9241f/.cirrus.yml
   # EXACTLY FROM
@@ -205,7 +210,7 @@ linuxarm64_build_task:
   # OCT 2022
   # https://docs.github.com/en/rest/releases/release
 
-  # NON-DIRECT REPLICATE THIS TEST MANUALLY
+  # NON-DIRECT REPLICATE THIS TEST MANUALLY IS TOUGH
   # Error “curl: (60) SSL certificate problem: unable to get local issuer certificate”
   # can be seen when the SSL certificate on the server is not verified or properly configured.
   # SEEN OCT 2022
@@ -236,7 +241,7 @@ linuxarm64_build_task:
   #
   # curl --insecure -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id'
   # 77518735
-  # WORKS (I WILL USE THIS ONE)
+  # WORKS (I WILL USE THIS "WAY")
   #
   only_if: $CIRRUS_TAG == ''
   upload_script: |
