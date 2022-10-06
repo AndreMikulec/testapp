@@ -159,11 +159,15 @@ linuxarm64_build_task:
     # I SHOULD NOT HARDCODE THIS
     - ls -alrt build/linux/arm64/debug/bundle/$CIRRUS_REPO_NAME
 
+    # "zip warning: name not matched" while compressing a directory
+    # zip -p password -r /Volumes/Storage\ 4/archive.zip /Volumes/GGZ/faster/mybigfolder/
+    # 2015 SEEN OCT 2022
+    # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
     # I SHOULD NOT HARDCODE THIS
     - pushd build/linux/arm64/debug/bundle
     - pwd
     # I SHOULD NOT HARDCODE THIS
-    - zip   –rv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
+    - zip   –rv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip `pwd`/
     - ls  -alrt $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - zip   -Tv $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - popd
