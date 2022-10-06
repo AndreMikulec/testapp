@@ -167,7 +167,7 @@ linuxarm64_build_task:
     - cd build/linux/arm64/debug/bundle
     - pwd
     # I SHOULD NOT HARDCODE THIS (SEEMS can not have a PATH in the zip file name)
-    - zip   –rv ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip ./
+    - zip   –rv ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
     - ls  -alrt ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - zip   -Tv ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip
     - mv        ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip $CIRRUS_WORKING_DIR
