@@ -159,7 +159,7 @@ linuxarm64_build_task:
     # I SHOULD NOT HARDCODE THIS
     - pushd build/linux/arm64/debug/bundle
     # I SHOULD NOT HARDCODE THIS
-    - zip –r $CIRRUS_WORKING_DIR\${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
+    - zip –r $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.zip *
     - popd
 
     ## # Release Assets
@@ -243,8 +243,7 @@ linuxarm64_build_task:
   # 77518735
   # WORKS (I WILL USE THIS "WAY")
   #
-  only_if: $CIRRUS_TAG == ''
-  upload_script: |
+  github_release_script: |
     #!/usr/bin/env bash
     set -e
 
