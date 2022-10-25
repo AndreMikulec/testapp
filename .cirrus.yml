@@ -2,7 +2,7 @@ task:
   name: Windows
   windows_container:
     image: mcr.microsoft.com/windows/servercore:ltsc2019
-  run_script: sysinfo
+  run_script: systeminfo
 
 # linuxarm64_build_task:
 #   # I SHOULD NOT HARDCODE THAT ABOVE
