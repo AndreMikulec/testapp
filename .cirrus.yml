@@ -6,28 +6,49 @@ task:
   run_script: systeminfo
 
 task:
-  name: "windows nanoserver ltsc2022"
+  name: "windows nanoserver 10.0.20324.3-arm32v7"
   windows_container:
-    image: mcr.microsoft.com/windows/nanoserver:ltsc2022
-    # docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
-    # docker run mcr.microsoft.com/windows/nanoserver:2022
-    # OCT 2022
-    # https://mcr.microsoft.com/en-us/product/windows/nanoserver/about
-    # https://hub.docker.com/_/microsoft-windows-nanoserver
+    image: mcr.microsoft.com/windows/nanoserver:10.0.20324.3-arm32v7
+    # https://hub.docker.com/_/microsoft-windows-nanoserver-insider/
+    # https://mcr.microsoft.com/v2/windows/nanoserver/insider/tags/list
+    #  "10.0.18353.1-arm"
+    #  "10.0.20324.3-arm32v7"
   run_script: systeminfo
 
 task:
-  name: "windows nanoserver 2022"
+  name: "windows nanoserver 10.0.18353.1-arm"
   windows_container:
-    image: mcr.microsoft.com/windows/nanoserver:2022
-    # docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
-    # docker run mcr.microsoft.com/windows/nanoserver:2022
-    # OCT 2022
-    # https://mcr.microsoft.com/en-us/product/windows/nanoserver/about
-    # https://hub.docker.com/_/microsoft-windows-nanoserver
+    image: mcr.microsoft.com/windows/nanoserver:10.0.18353.1-arm
+    # https://hub.docker.com/_/microsoft-windows-nanoserver-insider/
+    # https://mcr.microsoft.com/v2/windows/nanoserver/insider/tags/list
+    #  "10.0.18353.1-arm"
+    #  "10.0.20324.3-arm32v7"
   run_script: systeminfo
 
-# WAITING AND QUEUED FOREVER
+# # QUEUED FOREVER
+# task:
+#   name: "windows nanoserver ltsc2022"
+#   windows_container:
+#     image: mcr.microsoft.com/windows/nanoserver:ltsc2022
+#     # docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
+#     # docker run mcr.microsoft.com/windows/nanoserver:2022
+#     # OCT 2022
+#     # https://mcr.microsoft.com/en-us/product/windows/nanoserver/about
+#     # https://hub.docker.com/_/microsoft-windows-nanoserver
+#   run_script: systeminfo
+# 
+# task:
+#   name: "windows nanoserver 2022"
+#   windows_container:
+#     image: mcr.microsoft.com/windows/nanoserver:2022
+#     # docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
+#     # docker run mcr.microsoft.com/windows/nanoserver:2022
+#     # OCT 2022
+#     # https://mcr.microsoft.com/en-us/product/windows/nanoserver/about
+#     # https://hub.docker.com/_/microsoft-windows-nanoserver
+#   run_script: systeminfo
+
+# # WAITING AND QUEUED FOREVER
 # task:
 #   name: "windows servercore ltsc2022"
 #   windows_container:
