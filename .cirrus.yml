@@ -1,339 +1,350 @@
 task:
-  name: "windows servercore ltsc2019"
+  name: "windows servercore ltsc2022"
   windows_container:
-    image: mcr.microsoft.com/windows/servercore:ltsc2019
+    image: mcr.microsoft.com/windows/servercore:ltsc2022
+    # OCT 2022
+    # https://mcr.microsoft.com/en-us/product/windows/servercore/about
   run_script: systeminfo
 
 task:
-  # I SHOULD NOT HARDCODE THAT ABOVE
-  # If fails to build THEN check THIS OUT
-  # https://cirrus-ci.com/github/AndreMikulec/testapp
-  name: "arm cimg/base:edge"
-  arm_container:
-    image: cimg/base:edge
-    cpu: 2
-    # if [   +6 ms] FAILED: /tmp/cirrus-ci-build/linux/flutter/ephemeral/libflutter_linux_gtk.so
-    #   then MAYBE!?!not enough memory
-    memory: 2G
-  timeout_in: 5m
-#
-# Release Assets
-# https://cirrus-ci.org/examples/#release-assets
-#
-# some default environment variables are pre-defined
-#   CIRRUS_TAG
-#     Tag name if current build was triggered by a new tag. For example v1.0
-#   CIRRUS_RELEASE
-#     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
-# https://cirrus-ci.org/guide/writing-tasks/
-#
-# CIRRUS_TAG	Tag name if current build was triggered by a new tag. For example v1.0
-# CIRRUS_RELEASE	GitHub Release id if current tag was created for a release
-# https://cirrus-ci.org/guide/writing-tasks/#environment-variables
-#
-#   # the case seems, in a separate task,
-#   #  that I have to set this CIRRUS_RELEASE value myself
-#   filename:.cirrus.yml CIRRUS_RELEASE
-#   https://github.com/search?q=filename%3A.cirrus.yml+CIRRUS_RELEASE
-#
-# Secured Variables (per repository)
-#   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
-#   FROM
-#     https://cirrus-ci.com/settings/github/AndreMikulec
-#       Owner-Level Secured Variables
-#       NOTE . . .
-#       API Settings
-#         Need an API token for scripts or testing?
-#           https://cirrus-ci.org/api/
-#             Cirrus CI exposes GraphQL API for integrators to use through https://api.cirrus-ci.com/graphql endpoint.
-# OR FROM
-#   https://cirrus-ci.com/github/AndreMikulec/REPOSITORY -> Settings
-#     Secured Variables
-#   https://cirrus-ci.com/github/AndreMikulec/testapp
-#     Secured Variables
-#
-  ## only_if: $CIRRUS_TAG != ''
-  env:
-    # That's why you need to create a personal access token with full access to repo scope. (NOT_YET_VERIFIED)
-    # https://cirrus-ci.org/examples/#release-assets
-    # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
-    GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
-
-  build_script:
-    - uname -a
-    - whoami
-    - echo `pwd`
-    - echo CIRRUS_REPO_FULL_NAME: $CIRRUS_REPO_FULL_NAME
-    - echo CIRRUS_REPO_NAME: $CIRRUS_REPO_NAME
-    - echo CIRRUS_TAG: $CIRRUS_TAG
-    - echo CIRRUS_WORKING_DIR: $CIRRUS_WORKING_DIR
-    - ls -alrt
-    - echo ${PATH} || true
-
-    #
-    # uname -a
-    # gcc: latest
-    # Linux cirrus-ci-task-6527987532169216 5.4.209-116.367.amzn2.aarch64 #1 SMP Wed Aug 31 00:10:02 UTC 2022 aarch64 aarch64 aarch64
-    # whoami
-    # circleci
-    # echo `pwd`
-    # /tmp/cirrus-ci-build
-    # echo ${PATH} || true
-    # /home/circleci/bin:/home/circleci/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    #
-    # EARLY OCT 2022
-    # cimg/base:edge
-    # https://download.docker.com/linux/ubuntu jammy InRelease
-    # http://ports.ubuntu.com/ubuntu-ports jammy*
-    #
-
-    - ls -l /home/circleci/bin || true
-    - ls -l /home/circleci/.local/bin || true
-    - ls -l /usr/local/sbin || true
-    - ls -l /usr/local/bin || true
-    - ls -l /usr/sbin || true
-    - ls -l /usr/bin || true
-    - ls -l /sbin || true
-    - ls -l /bin || true
-
+  name: "windows servercore insider 10.0.20348.1"
+  windows_container:
+    image: mcr.microsoft.com/windows/server/insider:10.0.20348.1
     # OCT 2022
-    # mostly from
-    # Linux install
-    # * Install Flutter manually * section
-    # https://docs.flutter.dev/get-started/install/linux
-    # . . .
+    # https://mcr.microsoft.com/en-us/product/windows/server/insider/about
+  run_script: systeminfo
 
-    # https://zoomadmin.com/HowToInstall/UbuntuPackage/file
-    - sudo apt-get update -y
-    - sudo apt-get install -y file
-    # ONLY if doing: Flutter `test`
-    - sudo apt-get install -y libglu1-mesa
 
-    # OTHERS
-    - sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
-
-    # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
-    # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
-    # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
-    # add
-    # Building Linux apps with Flutter
-    # * Preparing Linux apps for distribution * section
-    # https://docs.flutter.dev/development/platform-integration/linux/building
-    - sudo apt-get install libgtk-3-0 libblkid1 liblzma5
-
-    # personal preference
-    # https://linuxhint.com/install-7zip-compression-tool-on-ubuntu/
-    # - sudo apt-get install -y 7zip-full
-    # Unable to locate package 7zip-full
-
-    # DEEPLY CONSIDER
-    # Download	.tar.xz	64-bit Linux arm64
-    # https://www.7-zip.org/download.html
-
-    # NOTE "cimg/base:edge" DOES HAVE
-    # tar
-    # git
-    # gunzip, unzip, gzip
-    #
-    # A jq program is a "filter"
-    # Windows
-    # jq 1.6 executables for 64-bit or 32-bit.
-    # https://stedolan.github.io/jq/manual/
-    # jq  # determine CIRRUS_RELEASE and curl uses CIRRUS_REPO_FULL_NAME CIRRUS_TAG and possibly GITHUB_TOKEN
-
-    # OPTION 2 OF 2
-    - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /tmp/flutter
-    - export PATH="$PATH:/tmp/flutter/bin:/tmp/flutter/bin/cache/dart-sdk/bin"
-
-    - flutter config --no-analytics
-    - flutter config --no-enable-web
-    - flutter config --enable-linux-desktop
-    - flutter precache --linux
-    - flutter doctor -v
-
-    - which dart
-    - dart --version
-    - which flutter
-    - flutter --version
-
-    # - flutter create .
-    # avoid "cirrus-ci-build" is not a valid Dart package name
-    - flutter create --project-name $CIRRUS_REPO_NAME .
-
-    - flutter pub get
-    #
-    # I SHOULD NOT HARDCODE THIS
-    - flutter build linux --debug -v
-    # I SHOULD NOT HARDCODE THIS
-    - ls -alrt build/linux/arm64/debug/bundle
-    # I SHOULD NOT HARDCODE THIS
-    - ls -alrt build/linux/arm64/debug/bundle/$CIRRUS_REPO_NAME
-
-    # "zip warning: name not matched" while compressing a directory
-    # zip -p password -r /Volumes/Storage\ 4/archive.zip /Volumes/GGZ/faster/mybigfolder/
-    # 2015 SEEN OCT 2022
-    # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
-    # I (ubuntu zip EXECUTABLE IS BAD BUG BAD BUG)
-    # I SHOULD NOT HARDCODE THIS
-    - cd build/linux/arm64/debug/bundle
-    # I SHOULD NOT HARDCODE THIS
-    - tar -zcvf $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz *
-    - cd $CIRRUS_WORKING_DIR
-
-    ## # Release Assets
-    ## # https://cirrus-ci.org/examples/#release-assets
-    ## # env: bash\r: No such file or directory [duplicate]
-    ## # 2015 seen 2022
-    ## # https://stackoverflow.com/questions/29045140/env-bash-r-no-such-file-or-directory
-    ## - sed -i $'s/\r$//' cirrus-ci-release-assets.sh
-    ## # I SHOULD NOT HARDCODE THIS
-    ## - chmod u+x cirrus-ci-release-assets.sh
-    ## - ./cirrus-ci-release-assets.sh
-
-  zipped_artifacts:
-
-    # accepts a glob pattern of files relative to $CIRRUS_WORKING_DIR
-    # https://cirrus-ci.org/guide/writing-tasks/#artifacts-instruction
-    #
-    # CIRRUS_WORKING_DIR	cirrus-ci-build folder inside of a system's temporary folder
-    # Working directory where Cirrus CI executes builds.
-    # Default to cirrus-ci-build folder inside of a system's temporary folder.
-    # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
-    #
-    path: "*.tar.gz"
-    type: application/gzip
-
-  # release # Much is based on
-
-  # Release Assets
-  # https://cirrus-ci.org/examples/#release-assets
-
-  # Create a Release / Get a release by tag name
-  # OCT 2022
-  # https://docs.github.com/en/rest/releases/release
-  # https://docs.github.com/en/rest/releases/releases#create-a-release
-  # https://docs.github.com/en/rest/releases/releases#get-a-release-by-tag-name
-
-  # https://github.com/SciQLop/CDFpp/blob/db9949947a20f2aa42985168645088a82ee9241f/.cirrus.yml
-  # EXACTLY FROM
-  # https://github.com/joseluisq/paket/blob/5708e9b56ee9a3f871ca1ae8c679350083064069/.cirrus.yml
-  #
-  # https://github.com/joseluisq/static-web-server/blob/432b591277de8556b2708757eee4281f2310e041/.cirrus.yml
-  # PROB FROM
-  # https://github.com/joseluisq/paket/blob/5708e9b56ee9a3f871ca1ae8c679350083064069/.cirrus.yml
-  #
-  # https://github.com/pmav99/poetry11/blob/68649946fe09d52ed1a5844bda6690ba6327c408/.cirrus.yml
-
-  # CREATE A NEW GITHUB RELEASE (IF EXISTS, GITHUB WILL REJECT WITH A RETURN MESSAGE)
-  # Proper Ways to Pass Environment Variables in JSON for cURL POST
-  # Dec 5, 2019
-  # SEEN OCT 2022
-  # https://towardsdatascience.com/proper-ways-to-pass-environment-variables-in-json-for-curl-post-f797d2698bf3
-  # # ANDRE ALSO ADD IF A MEMORY LEAK HAPPENS IN TE RELEASE name or BODY then do . . .
-  # # "name":"'"$CIRRUS_TAG"'", "body":"Production '"$CIRRUS_TAG"'"
-
-  # curl \
-  #   -H "Accept: application/vnd.github+json" \
-  #   -H "Authorization: Bearer <YOUR-TOKEN>" \
-  #   https://api.github.com/repos/OWNER/REPO/releases/tags/TAG
-
-  # NON-DIRECT REPLICATE THIS TEST MANUALLY IS TOUGH
-  # Error “curl: (60) SSL certificate problem: unable to get local issuer certificate”
-  # can be seen when the SSL certificate on the server is not verified or properly configured.
-  # SEEN OCT 2022
-  # https://matomo.org/faq/troubleshooting/what-to-do-when-you-see-curl-60-ssl-certificate-problem-unable-to-get-local-issuer-certificate-error
-
-  # URL ignore SSL certificate warnings command
-  # --insecure
-  # https://www.cyberciti.biz/faq/how-to-curl-ignore-ssl-certificate-warnings-command-option/
-
-  # curl \
-  #   --insecure \
-  #   -H "Accept: application/vnd.github+json" \
-  #   -H "Authorization: Bearer $GITHUB_TOKEN" \
-  #   https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG
-  # WORKS
-
-  # COMMON WAY
-  # set +x # never want to display GITHUB_TOKEN
-  # CIRRUS_RELEASE=$(curl --insecure -sL -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases | jq -c "[ .[] | select( .tag_name | contains(\"$CIRRUS_TAG\")) ] | .[0]" | jq -r '.id')
-  #   MSYS2 - ANDRE MANUAL TESTING
-  #   in bash shell file or command line
-  #   jq: error (at <stdin>:346): Cannot index string with string "tag_name"
-
-  # ANDRE
-  # THIS WAY
-  # CIRRUS_RELEASE=$(curl -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id')
-  # https://github.com/pmav99/poetry11/blob/68649946fe09d52ed1a5844bda6690ba6327c408/.cirrus.yml
-  #
-  # curl --insecure -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id'
-  # 77518735
-  # WORKS (I WILL USE THIS "WAY")
-  #
-  github_release_script: |
-    #!/usr/bin/env bash
-    set -e
-
-    if [[ "$CIRRUS_TAG" == "" ]]; then
-      echo "Not tagged. Not a release. No need to deploy!"
-      exit 0
-    fi
-
-    if [[ "$GITHUB_TOKEN" == "" ]]; then
-      echo "GitHub access token GITHUB_TOKEN env is not provided!"
-      exit 1
-    fi
-
-    # The release must already exist, so try to create a release
-    # If the release already exists, then nothing changes
-
-    curl \
-      --insecure \
-      -X POST \
-      -H "Accept: application/vnd.github+json" \
-      -H "Authorization: Bearer $GITHUB_TOKEN" \
-      https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases \
-      -d '{"tag_name":"'"$CIRRUS_TAG"'"}' || true
-
-    # The release must already exist
-    #
-    RETRIES=0
-    until [ $RETRIES -eq 20 ]
-    do
-      echo "Finding the GitHub release associated with '$CIRRUS_TAG' tag..."
-      CIRRUS_RELEASE=$(curl --insecure -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id')
-      [[ "$CIRRUS_RELEASE" != "null" ]] && break
-      RETRIES=$((RETRIES+1))
-      sleep 30
-    done
-
-    if [[ "$CIRRUS_RELEASE" == "null" ]]; then
-        echo "Can not find the associated GitHub '$CIRRUS_TAG' release!"
-        exit 1
-    fi
-
-    echo "GitHub release '$CIRRUS_TAG' found. Preparing asset files to upload..."
-
-    file_content_type="application/gzip"
-    files_to_upload=(
-      # relative paths of assets to upload
-      # I SHOULD NOT HARDCODE THIS
-      ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz
-    )
-    for fpath in "${files_to_upload[@]}"
-    do
-      echo "Uploading GitHub release asset '$fpath'..."
-      name=$(basename "$fpath")
-      url_to_upload="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$name"
-      curl \
-        --insecure \
-        -LX POST \
-        --data-binary @$fpath \
-        --header "Authorization: token $GITHUB_TOKEN" \
-        --header "Content-Type: $file_content_type" \
-        $url_to_upload
-    done
-
-    echo
-    echo "GitHub release '$CIRRUS_TAG' assets uploaded successfully."
+# task:
+#   # I SHOULD NOT HARDCODE THAT ABOVE
+#   # If fails to build THEN check THIS OUT
+#   # https://cirrus-ci.com/github/AndreMikulec/testapp
+#   name: "arm cimg/base:edge"
+#   arm_container:
+#     image: cimg/base:edge
+#     cpu: 2
+#     # if [   +6 ms] FAILED: /tmp/cirrus-ci-build/linux/flutter/ephemeral/libflutter_linux_gtk.so
+#     #   then MAYBE!?!not enough memory
+#     memory: 2G
+#   timeout_in: 5m
+# #
+# # Release Assets
+# # https://cirrus-ci.org/examples/#release-assets
+# #
+# # some default environment variables are pre-defined
+# #   CIRRUS_TAG
+# #     Tag name if current build was triggered by a new tag. For example v1.0
+# #   CIRRUS_RELEASE
+# #     GitHub Release id if current tag was created for a release. Handy for uploading release assets.
+# # https://cirrus-ci.org/guide/writing-tasks/
+# #
+# # CIRRUS_TAG	Tag name if current build was triggered by a new tag. For example v1.0
+# # CIRRUS_RELEASE	GitHub Release id if current tag was created for a release
+# # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
+# #
+# #   # the case seems, in a separate task,
+# #   #  that I have to set this CIRRUS_RELEASE value myself
+# #   filename:.cirrus.yml CIRRUS_RELEASE
+# #   https://github.com/search?q=filename%3A.cirrus.yml+CIRRUS_RELEASE
+# #
+# # Secured Variables (per repository)
+# #   https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
+# #   FROM
+# #     https://cirrus-ci.com/settings/github/AndreMikulec
+# #       Owner-Level Secured Variables
+# #       NOTE . . .
+# #       API Settings
+# #         Need an API token for scripts or testing?
+# #           https://cirrus-ci.org/api/
+# #             Cirrus CI exposes GraphQL API for integrators to use through https://api.cirrus-ci.com/graphql endpoint.
+# # OR FROM
+# #   https://cirrus-ci.com/github/AndreMikulec/REPOSITORY -> Settings
+# #     Secured Variables
+# #   https://cirrus-ci.com/github/AndreMikulec/testapp
+# #     Secured Variables
+# #
+#   ## only_if: $CIRRUS_TAG != ''
+#   env:
+#     # That's why you need to create a personal access token with full access to repo scope. (NOT_YET_VERIFIED)
+#     # https://cirrus-ci.org/examples/#release-assets
+#     # Owner-Level Secured Variables (value of https://github.com/settings/tokens GITHUB_ACTIONS_CREATE_RELEASE_REPO)
+#     GITHUB_TOKEN: ENCRYPTED[!1a8e14b4948b6beae2583951ab1abaf3800656297eabe0d877e918bb80050524248dbb11e6b5d6a2551befdd869a8100!]
+# 
+#   build_script:
+#     - uname -a
+#     - whoami
+#     - echo `pwd`
+#     - echo CIRRUS_REPO_FULL_NAME: $CIRRUS_REPO_FULL_NAME
+#     - echo CIRRUS_REPO_NAME: $CIRRUS_REPO_NAME
+#     - echo CIRRUS_TAG: $CIRRUS_TAG
+#     - echo CIRRUS_WORKING_DIR: $CIRRUS_WORKING_DIR
+#     - ls -alrt
+#     - echo ${PATH} || true
+# 
+#     #
+#     # uname -a
+#     # gcc: latest
+#     # Linux cirrus-ci-task-6527987532169216 5.4.209-116.367.amzn2.aarch64 #1 SMP Wed Aug 31 00:10:02 UTC 2022 aarch64 aarch64 aarch64
+#     # whoami
+#     # circleci
+#     # echo `pwd`
+#     # /tmp/cirrus-ci-build
+#     # echo ${PATH} || true
+#     # /home/circleci/bin:/home/circleci/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#     #
+#     # EARLY OCT 2022
+#     # cimg/base:edge
+#     # https://download.docker.com/linux/ubuntu jammy InRelease
+#     # http://ports.ubuntu.com/ubuntu-ports jammy*
+#     #
+# 
+#     - ls -l /home/circleci/bin || true
+#     - ls -l /home/circleci/.local/bin || true
+#     - ls -l /usr/local/sbin || true
+#     - ls -l /usr/local/bin || true
+#     - ls -l /usr/sbin || true
+#     - ls -l /usr/bin || true
+#     - ls -l /sbin || true
+#     - ls -l /bin || true
+# 
+#     # OCT 2022
+#     # mostly from
+#     # Linux install
+#     # * Install Flutter manually * section
+#     # https://docs.flutter.dev/get-started/install/linux
+#     # . . .
+# 
+#     # https://zoomadmin.com/HowToInstall/UbuntuPackage/file
+#     - sudo apt-get update -y
+#     - sudo apt-get install -y file
+#     # ONLY if doing: Flutter `test`
+#     - sudo apt-get install -y libglu1-mesa
+# 
+#     # OTHERS
+#     - sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+# 
+#     # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
+#     # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
+#     # THE RUNTIME END USER MAY ALSO NEED TO INSTALL
+#     # add
+#     # Building Linux apps with Flutter
+#     # * Preparing Linux apps for distribution * section
+#     # https://docs.flutter.dev/development/platform-integration/linux/building
+#     - sudo apt-get install libgtk-3-0 libblkid1 liblzma5
+# 
+#     # personal preference
+#     # https://linuxhint.com/install-7zip-compression-tool-on-ubuntu/
+#     # - sudo apt-get install -y 7zip-full
+#     # Unable to locate package 7zip-full
+# 
+#     # DEEPLY CONSIDER
+#     # Download	.tar.xz	64-bit Linux arm64
+#     # https://www.7-zip.org/download.html
+# 
+#     # NOTE "cimg/base:edge" DOES HAVE
+#     # tar
+#     # git
+#     # gunzip, unzip, gzip
+#     #
+#     # A jq program is a "filter"
+#     # Windows
+#     # jq 1.6 executables for 64-bit or 32-bit.
+#     # https://stedolan.github.io/jq/manual/
+#     # jq  # determine CIRRUS_RELEASE and curl uses CIRRUS_REPO_FULL_NAME CIRRUS_TAG and possibly GITHUB_TOKEN
+# 
+#     # OPTION 2 OF 2
+#     - git clone --depth 1 --branch stable https://github.com/flutter/flutter.git  /tmp/flutter
+#     - export PATH="$PATH:/tmp/flutter/bin:/tmp/flutter/bin/cache/dart-sdk/bin"
+# 
+#     - flutter config --no-analytics
+#     - flutter config --no-enable-web
+#     - flutter config --enable-linux-desktop
+#     - flutter precache --linux
+#     - flutter doctor -v
+# 
+#     - which dart
+#     - dart --version
+#     - which flutter
+#     - flutter --version
+# 
+#     # - flutter create .
+#     # avoid "cirrus-ci-build" is not a valid Dart package name
+#     - flutter create --project-name $CIRRUS_REPO_NAME .
+# 
+#     - flutter pub get
+#     #
+#     # I SHOULD NOT HARDCODE THIS
+#     - flutter build linux --debug -v
+#     # I SHOULD NOT HARDCODE THIS
+#     - ls -alrt build/linux/arm64/debug/bundle
+#     # I SHOULD NOT HARDCODE THIS
+#     - ls -alrt build/linux/arm64/debug/bundle/$CIRRUS_REPO_NAME
+# 
+#     # "zip warning: name not matched" while compressing a directory
+#     # zip -p password -r /Volumes/Storage\ 4/archive.zip /Volumes/GGZ/faster/mybigfolder/
+#     # 2015 SEEN OCT 2022
+#     # https://unix.stackexchange.com/questions/179451/zip-warning-name-not-matched-while-compressing-a-directory
+#     # I (ubuntu zip EXECUTABLE IS BAD BUG BAD BUG)
+#     # I SHOULD NOT HARDCODE THIS
+#     - cd build/linux/arm64/debug/bundle
+#     # I SHOULD NOT HARDCODE THIS
+#     - tar -zcvf $CIRRUS_WORKING_DIR/${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz *
+#     - cd $CIRRUS_WORKING_DIR
+# 
+#     ## # Release Assets
+#     ## # https://cirrus-ci.org/examples/#release-assets
+#     ## # env: bash\r: No such file or directory [duplicate]
+#     ## # 2015 seen 2022
+#     ## # https://stackoverflow.com/questions/29045140/env-bash-r-no-such-file-or-directory
+#     ## - sed -i $'s/\r$//' cirrus-ci-release-assets.sh
+#     ## # I SHOULD NOT HARDCODE THIS
+#     ## - chmod u+x cirrus-ci-release-assets.sh
+#     ## - ./cirrus-ci-release-assets.sh
+# 
+#   zipped_artifacts:
+# 
+#     # accepts a glob pattern of files relative to $CIRRUS_WORKING_DIR
+#     # https://cirrus-ci.org/guide/writing-tasks/#artifacts-instruction
+#     #
+#     # CIRRUS_WORKING_DIR	cirrus-ci-build folder inside of a system's temporary folder
+#     # Working directory where Cirrus CI executes builds.
+#     # Default to cirrus-ci-build folder inside of a system's temporary folder.
+#     # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
+#     #
+#     path: "*.tar.gz"
+#     type: application/gzip
+# 
+#   # release # Much is based on
+# 
+#   # Release Assets
+#   # https://cirrus-ci.org/examples/#release-assets
+# 
+#   # Create a Release / Get a release by tag name
+#   # OCT 2022
+#   # https://docs.github.com/en/rest/releases/release
+#   # https://docs.github.com/en/rest/releases/releases#create-a-release
+#   # https://docs.github.com/en/rest/releases/releases#get-a-release-by-tag-name
+# 
+#   # https://github.com/SciQLop/CDFpp/blob/db9949947a20f2aa42985168645088a82ee9241f/.cirrus.yml
+#   # EXACTLY FROM
+#   # https://github.com/joseluisq/paket/blob/5708e9b56ee9a3f871ca1ae8c679350083064069/.cirrus.yml
+#   #
+#   # https://github.com/joseluisq/static-web-server/blob/432b591277de8556b2708757eee4281f2310e041/.cirrus.yml
+#   # PROB FROM
+#   # https://github.com/joseluisq/paket/blob/5708e9b56ee9a3f871ca1ae8c679350083064069/.cirrus.yml
+#   #
+#   # https://github.com/pmav99/poetry11/blob/68649946fe09d52ed1a5844bda6690ba6327c408/.cirrus.yml
+# 
+#   # CREATE A NEW GITHUB RELEASE (IF EXISTS, GITHUB WILL REJECT WITH A RETURN MESSAGE)
+#   # Proper Ways to Pass Environment Variables in JSON for cURL POST
+#   # Dec 5, 2019
+#   # SEEN OCT 2022
+#   # https://towardsdatascience.com/proper-ways-to-pass-environment-variables-in-json-for-curl-post-f797d2698bf3
+#   # # ANDRE ALSO ADD IF A MEMORY LEAK HAPPENS IN TE RELEASE name or BODY then do . . .
+#   # # "name":"'"$CIRRUS_TAG"'", "body":"Production '"$CIRRUS_TAG"'"
+# 
+#   # curl \
+#   #   -H "Accept: application/vnd.github+json" \
+#   #   -H "Authorization: Bearer <YOUR-TOKEN>" \
+#   #   https://api.github.com/repos/OWNER/REPO/releases/tags/TAG
+# 
+#   # NON-DIRECT REPLICATE THIS TEST MANUALLY IS TOUGH
+#   # Error “curl: (60) SSL certificate problem: unable to get local issuer certificate”
+#   # can be seen when the SSL certificate on the server is not verified or properly configured.
+#   # SEEN OCT 2022
+#   # https://matomo.org/faq/troubleshooting/what-to-do-when-you-see-curl-60-ssl-certificate-problem-unable-to-get-local-issuer-certificate-error
+# 
+#   # URL ignore SSL certificate warnings command
+#   # --insecure
+#   # https://www.cyberciti.biz/faq/how-to-curl-ignore-ssl-certificate-warnings-command-option/
+# 
+#   # curl \
+#   #   --insecure \
+#   #   -H "Accept: application/vnd.github+json" \
+#   #   -H "Authorization: Bearer $GITHUB_TOKEN" \
+#   #   https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG
+#   # WORKS
+# 
+#   # COMMON WAY
+#   # set +x # never want to display GITHUB_TOKEN
+#   # CIRRUS_RELEASE=$(curl --insecure -sL -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases | jq -c "[ .[] | select( .tag_name | contains(\"$CIRRUS_TAG\")) ] | .[0]" | jq -r '.id')
+#   #   MSYS2 - ANDRE MANUAL TESTING
+#   #   in bash shell file or command line
+#   #   jq: error (at <stdin>:346): Cannot index string with string "tag_name"
+# 
+#   # ANDRE
+#   # THIS WAY
+#   # CIRRUS_RELEASE=$(curl -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id')
+#   # https://github.com/pmav99/poetry11/blob/68649946fe09d52ed1a5844bda6690ba6327c408/.cirrus.yml
+#   #
+#   # curl --insecure -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id'
+#   # 77518735
+#   # WORKS (I WILL USE THIS "WAY")
+#   #
+#   github_release_script: |
+#     #!/usr/bin/env bash
+#     set -e
+# 
+#     if [[ "$CIRRUS_TAG" == "" ]]; then
+#       echo "Not tagged. Not a release. No need to deploy!"
+#       exit 0
+#     fi
+# 
+#     if [[ "$GITHUB_TOKEN" == "" ]]; then
+#       echo "GitHub access token GITHUB_TOKEN env is not provided!"
+#       exit 1
+#     fi
+# 
+#     # The release must already exist, so try to create a release
+#     # If the release already exists, then nothing changes
+# 
+#     curl \
+#       --insecure \
+#       -X POST \
+#       -H "Accept: application/vnd.github+json" \
+#       -H "Authorization: Bearer $GITHUB_TOKEN" \
+#       https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases \
+#       -d '{"tag_name":"'"$CIRRUS_TAG"'"}' || true
+# 
+#     # The release must already exist
+#     #
+#     RETRIES=0
+#     until [ $RETRIES -eq 20 ]
+#     do
+#       echo "Finding the GitHub release associated with '$CIRRUS_TAG' tag..."
+#       CIRRUS_RELEASE=$(curl --insecure -sL https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/tags/$CIRRUS_TAG | jq -r '.id')
+#       [[ "$CIRRUS_RELEASE" != "null" ]] && break
+#       RETRIES=$((RETRIES+1))
+#       sleep 30
+#     done
+# 
+#     if [[ "$CIRRUS_RELEASE" == "null" ]]; then
+#         echo "Can not find the associated GitHub '$CIRRUS_TAG' release!"
+#         exit 1
+#     fi
+# 
+#     echo "GitHub release '$CIRRUS_TAG' found. Preparing asset files to upload..."
+# 
+#     file_content_type="application/gzip"
+#     files_to_upload=(
+#       # relative paths of assets to upload
+#       # I SHOULD NOT HARDCODE THIS
+#       ${CIRRUS_REPO_NAME}_LinuxARM64_Debug.tar.gz
+#     )
+#     for fpath in "${files_to_upload[@]}"
+#     do
+#       echo "Uploading GitHub release asset '$fpath'..."
+#       name=$(basename "$fpath")
+#       url_to_upload="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$name"
+#       curl \
+#         --insecure \
+#         -LX POST \
+#         --data-binary @$fpath \
+#         --header "Authorization: token $GITHUB_TOKEN" \
+#         --header "Content-Type: $file_content_type" \
+#         $url_to_upload
+#     done
+# 
+#     echo
+#     echo "GitHub release '$CIRRUS_TAG' assets uploaded successfully."
 
