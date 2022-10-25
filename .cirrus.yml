@@ -1,18 +1,48 @@
+
 task:
-  name: "windows servercore ltsc2022"
+  name: Windows
   windows_container:
-    image: mcr.microsoft.com/windows/servercore:ltsc2022
-    # OCT 2022
-    # https://mcr.microsoft.com/en-us/product/windows/servercore/about
+    image: mcr.microsoft.com/windows/servercore:ltsc2019
   run_script: systeminfo
 
 task:
-  name: "windows servercore insider 10.0.20348.1"
+  name: "windows nanoserver ltsc2022"
   windows_container:
-    image: mcr.microsoft.com/windows/server/insider:10.0.20348.1
+    image: mcr.microsoft.com/windows/nanoserver:ltsc2022
+    # docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
+    # docker run mcr.microsoft.com/windows/nanoserver:2022
     # OCT 2022
-    # https://mcr.microsoft.com/en-us/product/windows/server/insider/about
+    # https://mcr.microsoft.com/en-us/product/windows/nanoserver/about
+    # https://hub.docker.com/_/microsoft-windows-nanoserver
   run_script: systeminfo
+
+task:
+  name: "windows nanoserver 2022"
+  windows_container:
+    image: mcr.microsoft.com/windows/nanoserver:2022
+    # docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
+    # docker run mcr.microsoft.com/windows/nanoserver:2022
+    # OCT 2022
+    # https://mcr.microsoft.com/en-us/product/windows/nanoserver/about
+    # https://hub.docker.com/_/microsoft-windows-nanoserver
+  run_script: systeminfo
+
+# WAITING AND QUEUED FOREVER
+# task:
+#   name: "windows servercore ltsc2022"
+#   windows_container:
+#     image: mcr.microsoft.com/windows/servercore:ltsc2022
+#     # OCT 2022
+#     # https://mcr.microsoft.com/en-us/product/windows/servercore/about
+#   run_script: systeminfo
+# 
+# task:
+#   name: "windows servercore insider 10.0.20348.1"
+#   windows_container:
+#     image: mcr.microsoft.com/windows/server/insider:10.0.20348.1
+#     # OCT 2022
+#     # https://mcr.microsoft.com/en-us/product/windows/server/insider/about
+#   run_script: systeminfo
 
 
 # task:
