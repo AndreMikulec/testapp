@@ -1,3 +1,9 @@
+task_windows_servercore:
+  name: "windows servercore ltsc2019"
+  windows_container:
+    image: mcr.microsoft.com/windows/servercore:ltsc2019
+  run_script: sysinfo
+
 linuxarm64_build_task:
   # I SHOULD NOT HARDCODE THAT ABOVE
   # If fails to build THEN check THIS OUT
