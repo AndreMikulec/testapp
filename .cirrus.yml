@@ -124,6 +124,8 @@ task:
 
   build_script:
     - uname -a
+    # Check curl Availability on Arm CImg
+    - curl --help
     - whoami
     - echo `pwd`
     - echo CIRRUS_REPO_FULL_NAME: $CIRRUS_REPO_FULL_NAME
