@@ -183,15 +183,18 @@ jobs:
           USER_GITHUB_SHA: ${{ github.sha }}
           USER_GITHUB_REF_NAME: ${{ github.ref_name }}
 
+      # https://man.openbsd.org/ssh_config
+      # https://man.openbsd.org/ssh
+      #
       - name: Linux sshpass and sftp Sends App to Sourceforge
         if: matrix.os == 'ubuntu-latest'
         run: |
           ls -alrt ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz
           export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
-          sshpass -e sftp -hostkey="acceptnew" andremikulec,andremikulec.u@frs.sourceforge.net << !
+          sshpass -e sftp -o BatchMode=yes -o StrictHostKeyChecking=accept-new andremikulec,andremikulec.u@frs.sourceforge.net << EOF
              put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/
              exit
-          !
+          EOF
 
 #           # winscp /command "open sftp://andremikulec%2Candremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey=""acceptnew"" -rawsettings Compression=1" "put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/" "exit" 2>&1 || date /t
 # 
@@ -296,6 +299,7 @@ jobs:
           sudo make install
           make distclean
           cd ../..
+          export PATH=/opt/local/libexec/macports/bin:$PATH
           port install sshpass
 
       - name: Set up JDK 11
