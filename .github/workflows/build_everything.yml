@@ -188,9 +188,9 @@ jobs:
         run: |
           ls -alrt ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz
           export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
-          sshpass -e sftp -hostkey="acceptnew" -o BatchMode=no -b - andremikulec,andremikulec.u@frs.sourceforge.net << !
+          sshpass -e sftp -hostkey="acceptnew" andremikulec,andremikulec.u@frs.sourceforge.net << !
              put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/
-             bye
+             exit
           !
 
 #           # winscp /command "open sftp://andremikulec%2Candremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey=""acceptnew"" -rawsettings Compression=1" "put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/" "exit" 2>&1 || date /t
@@ -200,10 +200,10 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          echo ${GITHUB_WORKSPACE}
-          dir ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip 
+          echo %GITHUB_WORKSPACE%
+          dir $%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip 
           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="acceptnew" > ftp.txt 2>&1 || date /t
-          echo put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
+          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
           winscp.com /script=ftp.txt || date /t
@@ -291,7 +291,6 @@ jobs:
           git clone https://github.com/macports/macports-base.git
           cd macports-base
           git checkout v2.8.0  # skip this if you want to use the development version
-          cd macports-base
           ./configure --enable-readline
           make
           sudo make install
