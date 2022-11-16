@@ -1,9 +1,10 @@
 
-task:
-  name: Windows
-  windows_container:
-    image: mcr.microsoft.com/windows/servercore:ltsc2019
-  run_script: systeminfo
+# # THERE - IF I EVER NEED FOR THE FUTURE
+# task:
+#   name: Windows
+#   windows_container:
+#     image: mcr.microsoft.com/windows/servercore:ltsc2019
+#   run_script: systeminfo
 
 # # QUEUED FOREVER
 # task:
