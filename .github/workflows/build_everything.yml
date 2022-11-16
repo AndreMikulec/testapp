@@ -324,8 +324,9 @@ jobs:
       - name: Sourceforge
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          username: andremikulec,andremikulec.u
-          server: frs.sourceforge.net
-          local_path:  './${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*
+          username: 'andremikulec,andremikulec.u'
+          server: 'frs.sourceforge.net'
+          local_path:  './${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/*.*'
           remote_path: '/home/frs/project/andremikulec'
-          password: ${{ secrets.FTP_PSW_SECRET }}
+          password: '${{ secrets.FTP_PSW_SECRET }}'
+          sftpArgs: '-o CheckHostIP=no -o StrictHostKeyChecking=no'
