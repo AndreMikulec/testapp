@@ -157,7 +157,7 @@ jobs:
         if: matrix.target == 'Windows'
         run: |
           dir
-          compress-archive -Path * -DestinationPath ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Upload artifacts
@@ -183,7 +183,6 @@ jobs:
 
       - name: Linux sshpass and sftp Sends App to Sourceforge
         if: matrix.os == 'ubuntu-latest'
-        shell: cmd
         run: |
           export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
           sshpass -e sftp -oBatchMode=no -b - andremikulec,andremikulec.u@frs.sourceforge.net << !
@@ -282,12 +281,12 @@ jobs:
       - name: Install MacPorts from Git and sshpass from Port On MacOs
         if: matrix.os == 'macos-latest'
         run: |
-          mkdir -p /opt/mports
-          cd /opt/mports
+          mkdir -p mports
+          cd mports
           git clone https://github.com/macports/macports-base.git
           cd macports-base
           git checkout v2.8.0  # skip this if you want to use the development version
-          cd /opt/mports/macports-base
+          cd mports/macports-base
           ./configure --enable-readline
           make
           sudo make install
