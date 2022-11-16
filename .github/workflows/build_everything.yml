@@ -150,14 +150,14 @@ jobs:
         if: matrix.target == 'Linux'
         run: |
           ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
+          tar czf ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for Windows
         if: matrix.target == 'Windows'
         run: |
           dir
-          compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          compress-archive -Path * -DestinationPath ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Upload artifacts
@@ -185,20 +185,21 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         shell: cmd
         run: |
-          export SSHPASS={{ secrets.FTP_PSW_SECRET }}
+          export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
           sshpass -e sftp -oBatchMode=no -b - andremikulec,andremikulec.u@frs.sourceforge.net << !
-             put ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/
+             put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/
              bye
           !
+
+#           # winscp /command "open sftp://andremikulec%2Candremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey=""acceptnew"" -rawsettings Compression=1" "put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/" "exit" 2>&1 || date /t
+# 
 
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          # winscp /command "open sftp://andremikulec%2Candremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey=""acceptnew"" -rawsettings Compression=1" "put ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/" "exit" 2>&1 || date /t
-          
           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="acceptnew" > ftp.txt 2>&1 || date /t
-          echo put ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
+          echo put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
           winscp.com /script=ftp.txt || date /t
@@ -278,15 +279,20 @@ jobs:
         run: |
           curl --help
 
-      - name: Install MacPorts and sshpass On MacOs
+      - name: Install MacPorts from Git and sshpass from Port On MacOs
         if: matrix.os == 'macos-latest'
         run: |
-          curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.8.0.tar.bz2
-          tar -xvjf MacPorts-2.8.0.tar.bz2
-          cd MacPorts-2.8.0/
-          ./configure
+          mkdir -p /opt/mports
+          cd /opt/mports
+          git clone https://github.com/macports/macports-base.git
+          cd macports-base
+          git checkout v2.8.0  # skip this if you want to use the development version
+          cd /opt/mports/macports-base
+          ./configure --enable-readline
+          make
           sudo make install
-          cd ..
+          make distclean
+          cd ../..
           port install sshpass
 
       - name: Set up JDK 11
@@ -331,35 +337,35 @@ jobs:
         if: matrix.target == 'Android'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.apk $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.apk ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for macOS
         if: matrix.target == 'macOS'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc --keepParent *.app $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          ditto -c -k --sequesterRsrc --keepParent *.app ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for Web
         if: matrix.target == 'Web'
         run: |
           ls -alrt
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
+          tar czf ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
 
       - name: Rename build for Android AppBundle
         if: matrix.target == 'Android_AppBundle'
         run: |
           ls -alrt
-          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.aab $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.aab ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
 
       - name: Compress build for iOS
         if: matrix.target == 'iOS'
         run: |
-          # ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
-          tar czf $GITHUB_WORKSPACE/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
+          # ditto -c -k --sequesterRsrc app-${{ matrix.build_mode }}.ipa ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          tar czf ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz *
         working-directory: ${{ matrix.build_path }}
 
       - name: Upload artifacts
