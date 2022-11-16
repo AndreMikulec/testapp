@@ -158,8 +158,9 @@ jobs:
         run: |
           dir
           compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
+          dir ${env:GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip
         working-directory: ${{ matrix.build_path }}
-
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -184,9 +185,10 @@ jobs:
       - name: Linux sshpass and sftp Sends App to Sourceforge
         if: matrix.os == 'ubuntu-latest'
         run: |
+          ls -alrt ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz
           export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
-          sshpass -e sftp -oBatchMode=no -b - andremikulec,andremikulec.u@frs.sourceforge.net << !
-             put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/
+          sshpass -hostkey="acceptnew" -e sftp -oBatchMode=no -b - andremikulec,andremikulec.u@frs.sourceforge.net << !
+             put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/
              bye
           !
 
@@ -197,6 +199,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
+          dir ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip 
           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="acceptnew" > ftp.txt 2>&1 || date /t
           echo put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
@@ -286,7 +289,7 @@ jobs:
           git clone https://github.com/macports/macports-base.git
           cd macports-base
           git checkout v2.8.0  # skip this if you want to use the development version
-          cd mports/macports-base
+          cd macports-base
           ./configure --enable-readline
           make
           sudo make install
