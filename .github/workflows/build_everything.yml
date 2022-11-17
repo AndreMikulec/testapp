@@ -245,7 +245,14 @@ jobs:
           # -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no
           # https://github.com/arn4/tesi-triennale/blob/3302e9b812806c59337f7c3a483b35dc417544cf/.github/workflows/build.yml
           #
-          sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no andremikulec,andremikulec.u@frs.sourceforge.net 2>&1>/dev/null
+          # 
+          # Warning: Permanently added 'frs.sourceforge.net,216.105.38.21' (ECDSA) to the list of known hosts.
+          # andremikulec,andremikulec.u@frs.sourceforge.net: Permission denied (publickey,keyboard-interactive).
+          # sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no andremikulec,andremikulec.u@frs.sourceforge.net: 2>&1>/dev/null
+
+          # scp
+          sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz andremikulec,andremikulec.u@frs.sourceforge.net:/home/frs/project/andremikulec
+
 
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
@@ -375,12 +382,18 @@ jobs:
           # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
           # 
           # How to install sshpass on Mac?
+          #   For Mac you will need to install xcode and command line tools then use the unofficial Homewbrew command:
           # LAST MODIFIED 2021 - SEEN NOV 2022
           # https://stackoverflow.com/questions/32255660/how-to-install-sshpass-on-mac
           #
-          curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
-          sshpass
-          
+          # How can I install the Command Line Tools completely from the command line?
+          # HARD!
+          # https://apple.stackexchange.com/questions/107307/how-can-i-install-the-command-line-tools-completely-from-the-command-line
+          # 
+          # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+          # NOTHING I CAN DO
+          echo NOTHING I CAN DO
+
           # if I need to append to a (root user) startup script
           # /root/.bashrc
           # https://askubuntu.com/questions/31501/where-is-bashrc-profile-for-root
