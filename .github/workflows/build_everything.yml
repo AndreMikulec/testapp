@@ -251,7 +251,7 @@ jobs:
           # sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no andremikulec,andremikulec.u@frs.sourceforge.net: 2>&1>/dev/null
 
           # scp
-          sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz andremikulec,andremikulec.u@frs.sourceforge.net:/home/frs/project/andremikulec
+          sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3 ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz andremikulec,andremikulec.u@frs.sourceforge.net:/home/frs/project/andremikulec
 
 
       - name: WinSCP Sends Windows App to Sourceforge
