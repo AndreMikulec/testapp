@@ -232,7 +232,7 @@ jobs:
       # https://linux.die.net/man/1/sshpass
       
       - name: Linux sshpass and sftp Sends App to Sourceforge
-        env: ${{ secrets.FTP_PSW_SECRET }}
+        env:
           SSHPASS: ${{ secrets.SSHPASS }}
         if: matrix.os == 'ubuntu-latest'
         run: |
