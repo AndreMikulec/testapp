@@ -228,15 +228,19 @@ jobs:
       #
       # https://ostechnix.com/sshpass-noninteractive-ssh-password-provider/
       #
+      # # sshpass [-ffilename|-dnum|-ppassword|-e] [options] command arguments
+      # https://linux.die.net/man/1/sshpass
+      
       - name: Linux sshpass and sftp Sends App to Sourceforge
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/ > ftplinux.txt
           echo exit >> ftplinux.txt
-          export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
+          # export SSHPASS=${{ secrets.FTP_PSW_SECRET }} # with -e
           # -b implies -o BatchMode=yes
           # -C implies -o Compression=yes
-          sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no andremikulec,andremikulec.u@frs.sourceforge.net 
+          sshpass -p ${{ secrets.FTP_PSW_SECRET }} sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no andremikulec,andremikulec.u@frs.sourceforge.net 2>&1>/dev/null || true
+
 
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
@@ -370,7 +374,7 @@ jobs:
           # https://stackoverflow.com/questions/32255660/how-to-install-sshpass-on-mac
           #
           curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
-          
+          sshpass
           
           # if I need to append to a (root user) startup script
           # /root/.bashrc
