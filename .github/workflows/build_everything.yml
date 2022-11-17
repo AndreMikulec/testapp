@@ -183,17 +183,15 @@ jobs:
           USER_GITHUB_SHA: ${{ github.sha }}
           USER_GITHUB_REF_NAME: ${{ github.ref_name }}
 
-
-
       # https://man.openbsd.org/ssh_config
       # https://man.openbsd.org/ssh
       # https://man.openbsd.org/sftp
       #
       # StrictHostKeyChecking
       #
-      # O.K. - FOR "FIRE AND FORGET" BUILD JOBS
+      # O.K. - FOR FIRE AND FORGET BUILD JOBS
       # accept-new then ssh	will automatically add
-	    #            new host keys to the user's known_hosts file, 
+	    #            new host keys to the users known_hosts file, 
 	    #            but will not	permit
 	    #            connections to hosts with changed host keys.
       #
