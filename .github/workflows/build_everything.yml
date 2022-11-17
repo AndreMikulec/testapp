@@ -183,34 +183,59 @@ jobs:
           USER_GITHUB_SHA: ${{ github.sha }}
           USER_GITHUB_REF_NAME: ${{ github.ref_name }}
 
+
+
       # https://man.openbsd.org/ssh_config
       # https://man.openbsd.org/ssh
+      # https://man.openbsd.org/sftp
+      # https://www.freebsd.org/cgi/man.cgi?ssh_config(5)
+      # https://www.freebsd.org/cgi/man.cgi?query=ssh&sektion=1
+      # https://www.freebsd.org/cgi/man.cgi?query=sftp
+      #
+      #      -b	batchfile
+      # 	     Batch mode	reads a	series of commands from	an input batchfile in-
+      # 	     stead of stdin.  Since it lacks user interaction it should	be
+      # 	     used in conjunction with non-interactive authentication
+      # 
+      # https://www.freebsd.org/cgi/man.cgi?query=sftp&sektion=1
+
+      # How To Use sshpass For Non-interactive SSH login In Scripts In Linux And FreeBSD
+      #
+      # SEE through "ps" command
+      # sshpass -p <remote-password> ssh remoteuser@ip-address
+      #
+      # SEE through a "history" file
+      # SSHPASS=almalinux sshpass -e ssh ostechnix@192.168.1.2
+      #
+      # SSH Password automation with sshpass in shell scripts in Linux and Unix
+      # Written by Sk October 11, 2022 
+      #
+      # DO NOT SEE
+      # export SSHPASS=almalinux
+      # sshpass -e ssh ostechnix@192.168.1.20
+      #
+      https://ostechnix.com/sshpass-noninteractive-ssh-password-provider/
       #
       - name: Linux sshpass and sftp Sends App to Sourceforge
         if: matrix.os == 'ubuntu-latest'
         run: |
-          ls -alrt ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz
+          echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/ > ftplinux.txt
+          echo exit >> ftplinux.txt
           export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
-          sshpass -e sftp -o BatchMode=yes -o StrictHostKeyChecking=accept-new andremikulec,andremikulec.u@frs.sourceforge.net << EOF
-             put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/
-             exit
-          EOF
-
-#           # winscp /command "open sftp://andremikulec%2Candremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey=""acceptnew"" -rawsettings Compression=1" "put ${GITHUB_WORKSPACE}\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/" "exit" 2>&1 || date /t
-# 
+          # -b implies -o BatchMode=yes
+          # -C implies -o Compression=yes
+          sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=accept-new andremikulec,andremikulec.u@frs.sourceforge.net 
 
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          echo %GITHUB_WORKSPACE%
-          dir $%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip 
+          echo %GITHUB_WORKSPACE% 
           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="acceptnew" > ftp.txt 2>&1 || date /t
           echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
           winscp.com /script=ftp.txt || date /t
-
 
   build_apk_appbundle_ios_macos_web:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
@@ -280,7 +305,7 @@ jobs:
             # asset_content_type: application/gzip
 
     steps:
-    
+
       - name: Check curl Availability on MacOS
         if: matrix.os == 'macos-latest'
         run: |
@@ -299,9 +324,37 @@ jobs:
           sudo make install
           make distclean
           cd ../..
-          export PATH=/opt/local/libexec/macports/bin:$PATH
-          port install sshpass
-
+          # ANDRE FOUND in "install output" - does not work
+          # export PATH=/opt/local/libexec/macports/bin:$PATH
+          #
+          # 2.5. MacPorts and the Shell
+          # https://guide.macports.org/chunked/installing.shell.html
+          #
+          export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+          export MANPATH=/opt/local/share/man:$MANPATH
+          export DISPLAY=:0.0
+          #
+          # port(1) Manual Page
+          # https://man.macports.org/port.1.html#_user_actions
+          #
+          port help install 
+          #
+          # Non-interactive ssh password authentication
+          #   sudo port install sshpass
+          # https://ports.macports.org/port/sshpass/
+          #
+          port install sshpass || true
+          sudo port install sshpass || true
+          /opt/local/bin/port install sshpass || true
+          sudo /opt/local/bin/port install sshpass || true
+          /opt/local/sbin/port install sshpass || true
+          sudo /opt/local/sbin/port install sshpass || true
+          
+          # if I need to append to a (root user) startup script
+          # /root/.bashrc
+          # https://askubuntu.com/questions/31501/where-is-bashrc-profile-for-root
+          
+          
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
