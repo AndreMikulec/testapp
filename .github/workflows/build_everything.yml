@@ -236,7 +236,7 @@ jobs:
           export SSHPASS=${{ secrets.FTP_PSW_SECRET }}
           # -b implies -o BatchMode=yes
           # -C implies -o Compression=yes
-          sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=accept-new andremikulec,andremikulec.u@frs.sourceforge.net 
+          sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no andremikulec,andremikulec.u@frs.sourceforge.net 
 
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
@@ -326,41 +326,51 @@ jobs:
       - name: Install MacPorts from Git and sshpass from Port On MacOs
         if: matrix.os == 'macos-latest'
         run: |
-          mkdir -p mports
-          cd mports
-          git clone https://github.com/macports/macports-base.git
-          cd macports-base
-          git checkout v2.8.0  # skip this if you want to use the development version
-          ./configure --enable-readline
-          make
-          sudo make install
-          make distclean
-          cd ../..
+          # mkdir -p mports
+          # cd mports
+          # git clone https://github.com/macports/macports-base.git
+          # cd macports-base
+          # git checkout v2.8.0  # skip this if you want to use the development version
+          # ./configure --enable-readline
+          # make
+          # sudo make install
+          # make distclean
+          # cd ../..
           # ANDRE FOUND in "install output" - does not work
           # export PATH=/opt/local/libexec/macports/bin:$PATH
           #
           # 2.5. MacPorts and the Shell
           # https://guide.macports.org/chunked/installing.shell.html
           #
-          export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-          export MANPATH=/opt/local/share/man:$MANPATH
-          export DISPLAY=:0.0
+          # export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+          # export MANPATH=/opt/local/share/man:$MANPATH
+          # export DISPLAY=:0.0
           #
           # port(1) Manual Page
           # https://man.macports.org/port.1.html#_user_actions
           #
-          port help install 
+          # port help install 
           #
           # Non-interactive ssh password authentication
           #   sudo port install sshpass
           # https://ports.macports.org/port/sshpass/
           #
-          port install sshpass || true
-          sudo port install sshpass || true
-          /opt/local/bin/port install sshpass || true
-          sudo /opt/local/bin/port install sshpass || true
-          /opt/local/sbin/port install sshpass || true
-          sudo /opt/local/sbin/port install sshpass || true
+          # port install sshpass || true # Error: Insufficient privileges to write to MacPorts install prefix.
+          # sudo port install sshpass || true # Error: Port sshpass not found
+          # /opt/local/bin/port install sshpass || true # Error: Insufficient privileges to write to MacPorts install prefix.
+          # sudo /opt/local/bin/port install sshpass || true # Error: Port sshpass not found
+          # /opt/local/sbin/port install sshpass || true # No such file or directory
+          # sudo /opt/local/sbin/port install sshpass || true # command not found
+          
+          # installed
+          # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+          # 
+          # How to install sshpass on Mac?
+          # LAST MODIFIED 2021 - SEEN NOV 2022
+          # https://stackoverflow.com/questions/32255660/how-to-install-sshpass-on-mac
+          #
+          curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+          
           
           # if I need to append to a (root user) startup script
           # /root/.bashrc
