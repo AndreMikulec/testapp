@@ -232,6 +232,8 @@ jobs:
       # https://linux.die.net/man/1/sshpass
       
       - name: Linux sshpass and sftp Sends App to Sourceforge
+        env: ${{ secrets.FTP_PSW_SECRET }}
+          SSHPASS: ${{ secrets.SSHPASS }}
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/ > ftplinux.txt
@@ -239,8 +241,11 @@ jobs:
           # export SSHPASS=${{ secrets.FTP_PSW_SECRET }} # with -e
           # -b implies -o BatchMode=yes
           # -C implies -o Compression=yes
-          sshpass -p ${{ secrets.FTP_PSW_SECRET }} sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no andremikulec,andremikulec.u@frs.sourceforge.net 2>&1>/dev/null || true
-
+          #
+          # -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no
+          # https://github.com/arn4/tesi-triennale/blob/3302e9b812806c59337f7c3a483b35dc417544cf/.github/workflows/build.yml
+          #
+          sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no andremikulec,andremikulec.u@frs.sourceforge.net 2>&1>/dev/null
 
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
