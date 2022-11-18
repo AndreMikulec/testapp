@@ -285,11 +285,17 @@ jobs:
           # Alternately, put "Host" and "User andremikulec,andremikulec.u" into  ~/.ssh/config (NOT TRIED)
           #
           # andremikulec@frs.sourceforge.net
+          # sshpass SEEMS to requre that andremikulec@frs.sourceforge.net is sent
           #
-          sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o Host frs.sourceforge.net -o User andremikulec -o LogLevel=DEBUG3 2>&1>/dev/null || true
+          sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3 andremikulec@frs.sourceforge.net 2>&1>/dev/null || true
         env:
           SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
 
+
+      # https://github.com/AndreMikulec/testapp/actions/runs/3495091718/jobs/5851479764
+      #
+      # This is a restricted Shell Account.
+      # You can only copy files to/from here.
 
       # https://codebeautify.org/yaml-validator
       #
@@ -303,8 +309,6 @@ jobs:
           remote_path: '/home/frs/project/andremikulec'
           password: '${{ secrets.FTP_PSW_SECRET }}'
           sftpArgs: '-o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3'
-
-
 
       # https://winscp.net/eng/docs/scriptcommand_open
       #
