@@ -266,49 +266,49 @@ jobs:
       # -o LogLevel=DEBUG3 -o Compression=yes -o ConnectTimeout=60
       #
 
-      # Note: SSHPass must be Previously installed (see above)
-      - name: Linux SFTP Sourceforge via SFTP and SSHPass
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec > ftplinux.txt
-          echo exit >> ftplinux.txt
-          #
-          # export SSHPASS=${{ secrets.FTP_PSW_SECRET }} # with -e
-          #
-          # -b implies -o BatchMode=yes
-          # -C implies -o Compression=yes (Most often I send a .zip or .7z. Therefore, I had already compressed.)
-          #
-          # -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no
-          # https://github.com/arn4/tesi-triennale/blob/3302e9b812806c59337f7c3a483b35dc417544cf/.github/workflows/build.yml
-          #
-          # YAML or SSHPast strip ALL single quotes from the "User", therefore, I can only use the simple "User" amikulec
-          # Alternately, put "Host" and "User andremikulec,andremikulec.u" into  ~/.ssh/config (NOT TRIED)
-          #
-          # andremikulec@frs.sourceforge.net
-          # sshpass SEEMS to requre that andremikulec@frs.sourceforge.net is sent
-          #
-          sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3 andremikulec@frs.sourceforge.net 2>&1>/dev/null || true
-        env:
-          SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
+#       # Note: SSHPass must be Previously installed (see above)
+#       - name: Linux SFTP Sourceforge via SFTP and SSHPass
+#         if: matrix.os == 'ubuntu-latest'
+#         run: |
+#           echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec > ftplinux.txt
+#           echo exit >> ftplinux.txt
+#           #
+#           # export SSHPASS=${{ secrets.FTP_PSW_SECRET }} # with -e
+#           #
+#           # -b implies -o BatchMode=yes
+#           # -C implies -o Compression=yes (Most often I send a .zip or .7z. Therefore, I had already compressed.)
+#           #
+#           # -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no
+#           # https://github.com/arn4/tesi-triennale/blob/3302e9b812806c59337f7c3a483b35dc417544cf/.github/workflows/build.yml
+#           #
+#           # YAML or SSHPast strip ALL single quotes from the "User", therefore, I can only use the simple "User" amikulec
+#           # Alternately, put "Host" and "User andremikulec,andremikulec.u" into  ~/.ssh/config (NOT TRIED)
+#           #
+#           # andremikulec@frs.sourceforge.net
+#           # sshpass SEEMS to requre that andremikulec@frs.sourceforge.net is sent
+#           #
+#           sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3 andremikulec@frs.sourceforge.net 2>&1>/dev/null || true
+#         env:
+#           SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
 
 
-      # https://github.com/AndreMikulec/testapp/actions/runs/3495091718/jobs/5851479764
-      #
-      # This is a restricted Shell Account.
-      # You can only copy files to/from here.
-
-      # https://codebeautify.org/yaml-validator
-      #
-      - name: Linux SFTP Sourceforge via SFTP-Deploy-Action
-        if: matrix.os == 'ubuntu-latest'
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          username: 'andremikulec'
-          server: 'frs.sourceforge.net'
-          local_path:  '${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz'
-          remote_path: '/home/frs/project/andremikulec'
-          password: '${{ secrets.FTP_PSW_SECRET }}'
-          sftpArgs: '-o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3'
+#       # https://github.com/AndreMikulec/testapp/actions/runs/3495091718/jobs/5851479764
+#       #
+#       # This is a restricted Shell Account.
+#       # You can only copy files to/from here.
+# 
+#       # https://codebeautify.org/yaml-validator
+#       #
+#       - name: Linux SFTP Sourceforge via SFTP-Deploy-Action
+#         if: matrix.os == 'ubuntu-latest'
+#         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#         with:
+#           username: 'andremikulec'
+#           server: 'frs.sourceforge.net'
+#           local_path:  '${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz'
+#           remote_path: '/home/frs/project/andremikulec'
+#           password: '${{ secrets.FTP_PSW_SECRET }}'
+#           sftpArgs: '-o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3'
 
       # https://winscp.net/eng/docs/scriptcommand_open
       #
