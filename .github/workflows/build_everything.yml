@@ -183,6 +183,8 @@ jobs:
           USER_GITHUB_SHA: ${{ github.sha }}
           USER_GITHUB_REF_NAME: ${{ github.ref_name }}
 
+
+
       # https://man.openbsd.org/ssh_config
       # https://man.openbsd.org/ssh
       # https://man.openbsd.org/sftp
@@ -231,27 +233,70 @@ jobs:
       # # sshpass [-ffilename|-dnum|-ppassword|-e] [options] command arguments
       # https://linux.die.net/man/1/sshpass
       
-      - name: Linux sshpass and sftp Sends App to Sourceforge
-        env:
-          SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
+      # # SFTP does not like the Sourceforge old "User" name ("name" needs to be quoted)
+      # AnonymousUser@ANONYMOUST ~
+      # $ sftp andremikulec,andremikulec.u@frs.sourceforge.net
+      # (andremikulec,andremikulec.u@frs.sourceforge.net) Password:
+      # (andremikulec,andremikulec.u@frs.sourceforge.net) Password:
+      # #
+      # # The newer simple form
+      # AnonymousUser@ANONYMOUST ~
+      # $ sftp   andremikulec@frs.sourceforge.net
+      # (andremikulec@frs.sourceforge.net) Password:
+      # Connected to frs.sourceforge.net.
+      # #
+      # AnonymousUser@ANONYMOUST ~
+      # $ sftp  "andremikulec,andremikulec.u"@frs.sourceforge.net
+      # $ sftp  'andremikulec,andremikulec.u'@frs.sourceforge.net
+      # (andremikulec,andremikulec.u@frs.sourceforge.net) Password:
+      # Connected to frs.sourceforge.net.
+      #
+      # Other "User" Problem 
+      # SOLUTION: Put "Host" and "User" into ~/.ssh/config
+      # Git-bash : ssh: start over, passed a different list publickey,password
+      # 2017 SEEN NOV 2022
+      # https://stackoverflow.com/questions/41818473/git-bash-ssh-start-over-passed-a-different-list-publickey-password
+      # AND
+      # Simplify Your Life With an SSH Config File
+      # https://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/
+      #
+      # Other USAGE
+      # https://www.freebsd.org/cgi/man.cgi?ssh_config(5)
+      #
+      # -o LogLevel=DEBUG3 -o Compression=yes -o ConnectTimeout=60
+      #
+
+      # Note: SSHPass must be Previously installed (see above)
+      - name: Linux SFTP Sourceforge via SFTP and SSHPass
         if: matrix.os == 'ubuntu-latest'
         run: |
-          echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec/ > ftplinux.txt
+          echo put ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz /home/frs/project/andremikulec > ftplinux.txt
           echo exit >> ftplinux.txt
+          #
           # export SSHPASS=${{ secrets.FTP_PSW_SECRET }} # with -e
+          #
           # -b implies -o BatchMode=yes
-          # -C implies -o Compression=yes
+          # -C implies -o Compression=yes (Most often I send a .zip or .7z. Therefore, I had already compressed.)
           #
           # -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no
           # https://github.com/arn4/tesi-triennale/blob/3302e9b812806c59337f7c3a483b35dc417544cf/.github/workflows/build.yml
           #
-          # 
-          # Warning: Permanently added 'frs.sourceforge.net,216.105.38.21' (ECDSA) to the list of known hosts.
-          # andremikulec,andremikulec.u@frs.sourceforge.net: Permission denied (publickey,keyboard-interactive).
-          # sshpass -e sftp -C -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no andremikulec,andremikulec.u@frs.sourceforge.net: 2>&1>/dev/null
+          sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no 'andremikulec,andremikulec.u'@frs.sourceforge.net 2>&1>/dev/null
+        env:
+          SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
 
-          # scp
-          sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3 ${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz andremikulec,andremikulec.u@frs.sourceforge.net:/home/frs/project/andremikulec
+
+      - name: Linux SFTP Sourceforge via SFTP-Deploy-Action
+        if: matrix.os == 'ubuntu-latest'
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          username: ''andremikulec,andremikulec.u''
+          server: 'frs.sourceforge.net'
+          local_path:  '${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz'
+          remote_path: '/home/frs/project/andremikulec'
+          password: '${{ secrets.FTP_PSW_SECRET }}'
+          sftpArgs: '-o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no'
+
 
 
       - name: WinSCP Sends Windows App to Sourceforge
