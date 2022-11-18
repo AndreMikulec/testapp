@@ -392,94 +392,94 @@ jobs:
 
     steps:
 
-      - name: Install Xcode (only needed for "Xcode Tools" then "askpass" install)
-        if: matrix.os == 'macos-latest'
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-          # With Xcode 5.0.1 and Mavericks 10.9 
-          # the command line tool is no longer available through Xcode.
-          # Instead they must be downloaded from the 
-          # Apple Developer Tools site: https://developer.apple.com/downloads/index.action. 
-          # This requires signing in with a developer account.
-          # 
-          # You can also login at developer.apple.com (fee account is fine) 
-          # and download it there. I was the only way for me. 
-          # 
-          # sudo xcode-select --install
-          # 
-          # produces the following GUI: [Install]
-          # 
-          # How to install Xcode Command Line Tools
-          # https://stackoverflow.com/questions/9329243/how-to-install-xcode-command-line-tools
-          # 
-
       - name: Check curl Availability on MacOS
         if: matrix.os == 'macos-latest'
         run: |
           curl --help
 
-      - name: Install MacPorts from Git and sshpass from Port On MacOs
-        if: matrix.os == 'macos-latest'
-        run: |
-          # mkdir -p mports
-          # cd mports
-          # git clone https://github.com/macports/macports-base.git
-          # cd macports-base
-          # git checkout v2.8.0  # skip this if you want to use the development version
-          # ./configure --enable-readline
-          # make
-          # sudo make install
-          # make distclean
-          # cd ../..
-          # ANDRE FOUND in "install output" - does not work
-          # export PATH=/opt/local/libexec/macports/bin:$PATH
-          #
-          # 2.5. MacPorts and the Shell
-          # https://guide.macports.org/chunked/installing.shell.html
-          #
-          # export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-          # export MANPATH=/opt/local/share/man:$MANPATH
-          # export DISPLAY=:0.0
-          #
-          # port(1) Manual Page
-          # https://man.macports.org/port.1.html#_user_actions
-          #
-          # port help install 
-          #
-          # Non-interactive ssh password authentication
-          #   sudo port install sshpass
-          # https://ports.macports.org/port/sshpass/
-          #
-          # port install sshpass || true # Error: Insufficient privileges to write to MacPorts install prefix.
-          # sudo port install sshpass || true # Error: Port sshpass not found
-          # /opt/local/bin/port install sshpass || true # Error: Insufficient privileges to write to MacPorts install prefix.
-          # sudo /opt/local/bin/port install sshpass || true # Error: Port sshpass not found
-          # /opt/local/sbin/port install sshpass || true # No such file or directory
-          # sudo /opt/local/sbin/port install sshpass || true # command not found
-          
-          # installed
-          # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
-          # 
-          # How to install sshpass on Mac?
-          #   For Mac you will need to install xcode and command line tools then use the unofficial Homewbrew command:
-          # LAST MODIFIED 2021 - SEEN NOV 2022
-          # https://stackoverflow.com/questions/32255660/how-to-install-sshpass-on-mac
-          #
-          # How can I install the Command Line Tools completely from the command line?
-          # HARD!
-          # https://apple.stackexchange.com/questions/107307/how-can-i-install-the-command-line-tools-completely-from-the-command-line
-          # 
-          # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
-          # NOTHING I CAN DO
-          echo NOTHING I CAN DO
-          # try with Xcode but without the command line tools
-          curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+#       - name: Install Xcode (only needed for "Xcode Tools" then "askpass" install)
+#         if: matrix.os == 'macos-latest'
+#         uses: maxim-lobanov/setup-xcode@v1
+#         with:
+#           xcode-version: latest-stable
+# 
+#           # With Xcode 5.0.1 and Mavericks 10.9 
+#           # the command line tool is no longer available through Xcode.
+#           # Instead they must be downloaded from the 
+#           # Apple Developer Tools site: https://developer.apple.com/downloads/index.action. 
+#           # This requires signing in with a developer account.
+#           # 
+#           # You can also login at developer.apple.com (fee account is fine) 
+#           # and download it there. I was the only way for me. 
+#           # 
+#           # sudo xcode-select --install
+#           # 
+#           # produces the following GUI: [Install]
+#           # 
+#           # How to install Xcode Command Line Tools
+#           # https://stackoverflow.com/questions/9329243/how-to-install-xcode-command-line-tools
+#           # 
 
-          # if I need to append to a (root user) startup script
-          # /root/.bashrc
-          # https://askubuntu.com/questions/31501/where-is-bashrc-profile-for-root
+#       - name: Install MacPorts from Git and sshpass from Port On MacOs
+#         if: matrix.os == 'macos-latest'
+#         run: |
+#           # mkdir -p mports
+#           # cd mports
+#           # git clone https://github.com/macports/macports-base.git
+#           # cd macports-base
+#           # git checkout v2.8.0  # skip this if you want to use the development version
+#           # ./configure --enable-readline
+#           # make
+#           # sudo make install
+#           # make distclean
+#           # cd ../..
+#           # ANDRE FOUND in "install output" - does not work
+#           # export PATH=/opt/local/libexec/macports/bin:$PATH
+#           #
+#           # 2.5. MacPorts and the Shell
+#           # https://guide.macports.org/chunked/installing.shell.html
+#           #
+#           # export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+#           # export MANPATH=/opt/local/share/man:$MANPATH
+#           # export DISPLAY=:0.0
+#           #
+#           # port(1) Manual Page
+#           # https://man.macports.org/port.1.html#_user_actions
+#           #
+#           # port help install 
+#           #
+#           # Non-interactive ssh password authentication
+#           #   sudo port install sshpass
+#           # https://ports.macports.org/port/sshpass/
+#           #
+#           # port install sshpass || true # Error: Insufficient privileges to write to MacPorts install prefix.
+#           # sudo port install sshpass || true # Error: Port sshpass not found
+#           # /opt/local/bin/port install sshpass || true # Error: Insufficient privileges to write to MacPorts install prefix.
+#           # sudo /opt/local/bin/port install sshpass || true # Error: Port sshpass not found
+#           # /opt/local/sbin/port install sshpass || true # No such file or directory
+#           # sudo /opt/local/sbin/port install sshpass || true # command not found
+#           
+#           # installed
+#           # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+#           # 
+#           # How to install sshpass on Mac?
+#           #   For Mac you will need to install xcode and command line tools then use the unofficial Homewbrew command:
+#           # LAST MODIFIED 2021 - SEEN NOV 2022
+#           # https://stackoverflow.com/questions/32255660/how-to-install-sshpass-on-mac
+#           #
+#           # How can I install the Command Line Tools completely from the command line?
+#           # HARD!
+#           # https://apple.stackexchange.com/questions/107307/how-can-i-install-the-command-line-tools-completely-from-the-command-line
+#           # 
+#           # curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+#           # NOTHING I CAN DO
+#           echo NOTHING I CAN DO
+#           # try with Xcode but without the command line tools
+#           curl -L https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb > sshpass.rb && brew install sshpass.rb && rm sshpass.rb
+# 
+#           # if I need to append to a (root user) startup script
+#           # /root/.bashrc
+#           # https://askubuntu.com/questions/31501/where-is-bashrc-profile-for-root
           
           
       - name: Set up JDK 11
