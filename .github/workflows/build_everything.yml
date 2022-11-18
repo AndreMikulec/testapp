@@ -286,11 +286,13 @@ jobs:
           SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
 
 
+      # https://codebeautify.org/yaml-validator
+      #
       - name: Linux SFTP Sourceforge via SFTP-Deploy-Action
         if: matrix.os == 'ubuntu-latest'
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          username: ''andremikulec,andremikulec.u''
+          username: '''andremikulec,andremikulec.u'''
           server: 'frs.sourceforge.net'
           local_path:  '${GITHUB_WORKSPACE}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.tar.gz'
           remote_path: '/home/frs/project/andremikulec'
@@ -299,12 +301,14 @@ jobs:
 
 
 
+      # https://winscp.net/eng/docs/scriptcommand_open
+      #
       - name: WinSCP Sends Windows App to Sourceforge
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
           echo %GITHUB_WORKSPACE% 
-          echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="acceptnew" > ftp.txt 2>&1 || date /t
+          echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="*" > ftp.txt 2>&1 || date /t
           echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
