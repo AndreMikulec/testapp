@@ -281,7 +281,7 @@ jobs:
           # -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no
           # https://github.com/arn4/tesi-triennale/blob/3302e9b812806c59337f7c3a483b35dc417544cf/.github/workflows/build.yml
           #
-          sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no '''andremikulec,andremikulec.u'''@frs.sourceforge.net 2>&1>/dev/null
+          sshpass -e sftp -b ftplinux.txt -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no ''''andremikulec,andremikulec.u''''@frs.sourceforge.net 2>&1>/dev/null
         env:
           SSHPASS: ${{ secrets.FTP_PSW_SECRET }}
 
