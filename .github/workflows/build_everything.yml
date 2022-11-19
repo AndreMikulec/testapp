@@ -35,8 +35,31 @@ jobs:
         env:
           RUNNER_CONTEXT: ${{ toJson(runner) }}
 
+
+
+  prereq_checks:
+    name: ${{ matrix.target }} ${{ matrix.target_detail }} deploy to Sf
+    if: ${{ always() }}
+    needs: build_apk_appbundle_ios_macos_web
+    runs-on: windows-latest
+
+    steps:
+
+      - name: Check curl Availability on Windows
+        run: |
+          curl --help
+
+      - name: Try curl
+        run: |
+          curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.05/testapp_Android_AppBundle_Debug.zip
+          dir REL_01.01.05/testapp_Android_AppBundle_Debug.zip
+          DIE_HERE
+
+
+
   build_windows_linux:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
+    needs: prereq_checks
     runs-on: ${{ matrix.os }}
     strategy:
       # Disable fail-fast as we want results from all even if one fails.
@@ -366,7 +389,6 @@ jobs:
           curl --help
 
       - name: Choco Install WinSCP
-        if: matrix.os == 'windows-latest'
         uses: crazy-max/ghaction-chocolatey@v2
         with:
           args: install -y winscp
@@ -380,6 +402,7 @@ jobs:
           echo %GITHUB_WORKSPACE%
           rem
           mkdir %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
+          echo curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
           curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
           dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" || date /t
           rem
@@ -393,6 +416,7 @@ jobs:
 
   build_apk_appbundle_ios_macos_web:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
+    needs: prereq_checks
     runs-on: macos-latest
     strategy:
       # Disable fail-fast as we want results from all even if one fails.
@@ -685,7 +709,6 @@ jobs:
           curl --help
 
       - name: Choco Install WinSCP
-        if: matrix.os == 'windows-latest'
         uses: crazy-max/ghaction-chocolatey@v2
         with:
           args: install -y winscp
@@ -699,6 +722,8 @@ jobs:
           echo %GITHUB_WORKSPACE%
           rem
           mkdir %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
+
+          echo curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
           curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
           dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" || date /t
           rem
