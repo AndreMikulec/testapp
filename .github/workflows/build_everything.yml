@@ -328,6 +328,7 @@ jobs:
   # WinSCP gathers this tagged release from Github and sends it to Sourceforge
   deploy_windows_linux_builds_to_Sourceforge:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
+    if: ${{ always() }}
     needs: build_windows_linux
     runs-on: windows-latest
     strategy:
@@ -640,6 +641,7 @@ jobs:
   # WinSCP gathers this tagged release from Github and sends it to Sourceforge
   deploy_macos_builds_to_Sourceforge:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
+    if: ${{ always() }}
     needs: build_apk_appbundle_ios_macos_web
     runs-on: windows-latest
     strategy:
