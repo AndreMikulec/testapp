@@ -310,18 +310,20 @@ jobs:
 #           password: '${{ secrets.FTP_PSW_SECRET }}'
 #           sftpArgs: '-o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o LogLevel=DEBUG3'
 
-      # https://winscp.net/eng/docs/scriptcommand_open
-      #
-      - name: WinSCP Sends Windows App to Sourceforge
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: |
-          echo %GITHUB_WORKSPACE% 
-          echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="*" > ftp.txt 2>&1 || date /t
-          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
-          echo exit >> ftp.txt
-          set PATH=C:\Program Files (x86)\WinSCP;%PATH%
-          winscp.com /script=ftp.txt || date /t
+#       # https://winscp.net/eng/docs/scriptcommand_open
+#       #
+#       - name: WinSCP Sends Windows App to Sourceforge
+#         if: matrix.os == 'windows-latest'
+#         shell: cmd
+#         run: |
+#           echo %GITHUB_WORKSPACE% 
+#           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="*" > ftp.txt 2>&1 || date /t
+#           echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
+#           echo exit >> ftp.txt
+#           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
+#           winscp.com /script=ftp.txt || date /t
+
+
 
   build_apk_appbundle_ios_macos_web:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
@@ -383,8 +385,8 @@ jobs:
             build_target: ipa
             build_mode: no-codesign
             build_path: build/ios/archive
-            # asset_extension: .zip
-            # asset_content_type: application/zip
+            # asset_extension: .tar.gz
+            # asset_content_type: application/gzip
             # asset_extension: .ipa
             # asset_content_type: application/octet-stream  ??
             # asset_extension: .tar.gz
