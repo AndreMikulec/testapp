@@ -325,6 +325,7 @@ jobs:
 
 
 
+  # WinSCP gathers this tagged release from Github and sends it to Sourceforge
   deploy_windows_linux_builds_to_Sourceforge:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
     needs: build_windows_linux
@@ -636,7 +637,7 @@ jobs:
           USER_GITHUB_REF_NAME: ${{ github.ref_name }}
 
 
-
+  # WinSCP gathers this tagged release from Github and sends it to Sourceforge
   deploy_macos_builds_to_Sourceforge:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
     needs: build_apk_appbundle_ios_macos_web
