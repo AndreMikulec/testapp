@@ -70,13 +70,13 @@ jobs:
 
 
           echo DOING curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
-          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }} || date /t
 
           dir || date /t
           del testapp_Android_AppBundle_Debug.zip || date /t
 
           echo DOING curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/%GITHUB_REF_NAME%/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
-          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/%GITHUB_REF_NAME%/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/%GITHUB_REF_NAME%/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }} || date /t
 
           dir || date /t
           del testapp_Android_AppBundle_Debug.zip || date /t
@@ -430,12 +430,12 @@ jobs:
           echo %GITHUB_WORKSPACE%
           rem
           mkdir %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
-          echo curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
-          curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          echo curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }}
+          curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }} || date /t
           dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" || date /t
           rem
           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="*" > ftp.txt 2>&1 || date /t
-          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
+          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }} /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
           winscp.com /script=ftp.txt || date /t
@@ -751,12 +751,12 @@ jobs:
           rem
           mkdir %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
 
-          echo curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
-          curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          echo curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }}
+          curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }} || date /t
           dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" || date /t
           rem
           echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="*" > ftp.txt 2>&1 || date /t
-          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
+          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}${{ matrix.asset_extension }} /home/frs/project/andremikulec/ >> ftp.txt
           echo exit >> ftp.txt
           set PATH=C:\Program Files (x86)\WinSCP;%PATH%
           winscp.com /script=ftp.txt || date /t
