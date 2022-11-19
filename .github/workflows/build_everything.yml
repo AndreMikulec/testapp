@@ -38,16 +38,16 @@ jobs:
 
 
   prereq_checks:
-    name: ${{ matrix.target }} ${{ matrix.target_detail }} deploy to Sf
-    if: ${{ always() }}
+    name: Prerequisite Checks
+    # if: ${{ always() }}
     runs-on: windows-latest
     strategy:
 
       matrix:
         include:
 
-          - target: Windows
-            target_detail: Release
+          - target: Android_AppBundle
+            target_detail: Debug
             asset_extension: .zip
 
     steps:
@@ -59,19 +59,27 @@ jobs:
       - name: Try curl
         shell: cmd
         run: |
-          curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.06/testapp_Android_AppBundle_Debug.zip
+          echo GITHUB_REF_NAME: %GITHUB_REF_NAME%
+          echo github.ref_name: ${{ github.ref_name }}
+
+          echo DOING curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.07/testapp_Android_AppBundle_Debug.zip
+          curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.07/testapp_Android_AppBundle_Debug.zip
+
           dir || date /t
           del testapp_Android_AppBundle_Debug.zip || date /t
-           
+
+
           echo DOING curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
-          
-          rem REL_01.01.06 = ${{ github.ref_name }}
-          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/REL_01.01.06/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
 
           dir || date /t
           del testapp_Android_AppBundle_Debug.zip || date /t
 
+          echo DOING curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/%GITHUB_REF_NAME%/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/%GITHUB_REF_NAME%/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
 
+          dir || date /t
+          del testapp_Android_AppBundle_Debug.zip || date /t
 
           DIE_HERE
 
