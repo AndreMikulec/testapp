@@ -325,6 +325,63 @@ jobs:
 
 
 
+  deploy_windows_linux_builds_to_Sourceforge:
+    name: ${{ matrix.target }} ${{ matrix.target_detail }}
+    needs: build_windows_linux
+    runs-on: windows-latest
+    strategy:
+      # Disable fail-fast as we want results from all even if one fails.
+      fail-fast: false
+      matrix:
+        include:
+
+          - target: Linux
+            target_detail: Release
+            asset_extension: .tar.gz
+
+          - target: Linux
+            target_detail: Debug
+            asset_extension: .tar.gz
+
+          - target: Windows
+            target_detail: Release
+            asset_extension: .zip
+
+          - target: Windows
+            target_detail: Debug
+            asset_extension: .zip
+            
+          # from the cirrus build - .cirrus.yml
+          
+          - target: LinuxARM64
+            target_detail: Debug
+            asset_extension: .tar.gz
+            
+    steps:
+    
+      - name: Check curl Availability on Windows
+        run: |
+          curl --help
+          
+      # https://winscp.net/eng/docs/scriptcommand_open
+      #
+      - name: WinSCP Sends Linux and Windows Created Applications to Sourceforge
+        if: github.ref_type == 'tag'
+        shell: cmd
+        run: |
+          echo %GITHUB_WORKSPACE% 
+          #
+          mkdir %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist
+          curl -L --ssl-no-revoke --output-dir "%GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist" -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+          #
+          echo open sftp://andremikulec,andremikulec.u:${{ secrets.FTP_PSW_SECRET }}@frs.sourceforge.net/ -hostkey="*" > ftp.txt 2>&1 || date /t
+          echo put %GITHUB_WORKSPACE%\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}_dist\${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.zip /home/frs/project/andremikulec/ >> ftp.txt
+          echo exit >> ftp.txt
+          set PATH=C:\Program Files (x86)\WinSCP;%PATH%
+          winscp.com /script=ftp.txt || date /t
+
+
+
   build_apk_appbundle_ios_macos_web:
     name: ${{ matrix.target }} ${{ matrix.target_detail }}
     runs-on: macos-latest
