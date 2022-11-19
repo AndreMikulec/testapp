@@ -41,6 +41,14 @@ jobs:
     name: ${{ matrix.target }} ${{ matrix.target_detail }} deploy to Sf
     if: ${{ always() }}
     runs-on: windows-latest
+    strategy:
+
+      matrix:
+        include:
+
+          - target: Windows
+            target_detail: Release
+            asset_extension: .zip
 
     steps:
 
@@ -49,9 +57,19 @@ jobs:
           curl --help
 
       - name: Try curl
+        shell: cmd
         run: |
-          curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.05/testapp_Android_AppBundle_Debug.zip
-          dir REL_01.01.05/testapp_Android_AppBundle_Debug.zip
+          curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.06/testapp_Android_AppBundle_Debug.zip
+          dir
+           
+           
+          echo curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
+          
+          rem REL_01.01.06 = ${{ github.ref_name }}
+          curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/REL_01.01.06/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
+
+          dir 
+
           DIE_HERE
 
 
