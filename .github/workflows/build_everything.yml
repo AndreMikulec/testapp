@@ -40,7 +40,6 @@ jobs:
   prereq_checks:
     name: ${{ matrix.target }} ${{ matrix.target_detail }} deploy to Sf
     if: ${{ always() }}
-    needs: build_apk_appbundle_ios_macos_web
     runs-on: windows-latest
 
     steps:
