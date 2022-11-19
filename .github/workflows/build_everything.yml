@@ -60,15 +60,18 @@ jobs:
         shell: cmd
         run: |
           curl -L --ssl-no-revoke -O https://github.com/AndreMikulec/testapp/releases/download/REL_01.01.06/testapp_Android_AppBundle_Debug.zip
-          dir
+          dir || date /t
+          del testapp_Android_AppBundle_Debug.zip || date /t
            
-           
-          echo curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
+          echo DOING curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }}
           
           rem REL_01.01.06 = ${{ github.ref_name }}
           curl -L --ssl-no-revoke -O   %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%/releases/download/REL_01.01.06/${{ github.event.repository.name }}_${{ matrix.target }}_${{ matrix.target_detail }}.${{ matrix.asset_extension }} || date /t
 
-          dir 
+          dir || date /t
+          del testapp_Android_AppBundle_Debug.zip || date /t
+
+
 
           DIE_HERE
 
